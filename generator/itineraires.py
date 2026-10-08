@@ -9,7 +9,7 @@ Une distance saisie dans la colonne « Distance réelle (km) » reste prioritair
 """
 import json, os, time, urllib.request, urllib.error
 
-DEFAUTS = {"actif": True, "service": "https://router.project-osrm.org", "max_par_publication": 400,
+DEFAUTS = {"actif": True, "service": "https://router.project-osrm.org", "max_par_publication": 2000,
            "pause_secondes": 1.1, "marge_duree": 1.12}
 
 

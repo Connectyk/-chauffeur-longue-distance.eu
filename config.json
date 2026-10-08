@@ -42,7 +42,7 @@
   "itineraires": {
     "actif": true,
     "service": "https://router.project-osrm.org",
-    "max_par_publication": 400,
+    "max_par_publication": 2000,
     "pause_secondes": 1.1,
     "marge_duree": 1.12
   }

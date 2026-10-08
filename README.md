@@ -58,8 +58,8 @@ Pour ajouter un quartier : une ligne dans l'onglet 04, puis ses coordonnées et 
 ## Distances routières réelles
 
 À chaque publication sur GitHub, le générateur demande au calculateur d'itinéraires d'OpenStreetMap (OSRM) la vraie distance, la durée
-et les autoroutes empruntées (« A6, A46 puis A7 ») pour 400 trajets au plus, puis les garde dans `data/itineraires.json`.
-Il faut donc quelques publications pour couvrir tous les trajets (relancez la publication depuis l'onglet **Actions → Run workflow**).
+et les autoroutes empruntées (« A6, A46 puis A7 ») pour 2 000 trajets au plus par publication, puis les garde dans `data/itineraires.json`.
+Les nouveaux trajets sont calculés automatiquement à la publication suivante.
 Une valeur saisie dans la colonne « Distance réelle (km) » ou « Axes routiers » de la matrice reste prioritaire.
 Pour désactiver : `config.json` → `itineraires` → `actif: false`. Le service OSRM public est gratuit mais limité : si les pages se multiplient,
 un service payant ou auto-hébergé peut le remplacer (champ `service`).
