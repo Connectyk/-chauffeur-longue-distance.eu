@@ -1,0 +1,77 @@
+/* Suivi des appels et des demandes de devis + envoi du formulaire.
+   Les événements partent dans dataLayer (Google Tag Manager) et dans gtag (GA4) si présents. */
+(function () {
+  var SITE = window.SITE || {};
+  var body = document.body;
+
+  function suivre(nom, params) {
+    var p = Object.assign({
+      page_path: location.pathname,
+      type_page: body.dataset.type || "",
+      trajet: body.dataset.trajet || ""
+    }, params || {});
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push(Object.assign({ event: nom }, p));
+    if (typeof window.gtag === "function") window.gtag("event", nom, p);
+  }
+
+  // Provenance : page d'entrée, référent, UTM, gclid (conservés pendant la visite)
+  var prov = {};
+  try {
+    prov = JSON.parse(sessionStorage.getItem("provenance") || "null") || { entree: location.pathname, referent: document.referrer || "direct" };
+    var q = new URLSearchParams(location.search);
+    ["utm_source", "utm_medium", "utm_campaign", "utm_term", "gclid"].forEach(function (k) { if (q.get(k)) prov[k] = q.get(k); });
+    sessionStorage.setItem("provenance", JSON.stringify(prov));
+  } catch (e) { prov = { entree: location.pathname }; }
+
+  // Clics sur les numéros de téléphone
+  document.addEventListener("click", function (e) {
+    var a = e.target.closest && e.target.closest('a[href^="tel:"]');
+    if (a) suivre("clic_appel", { emplacement: a.dataset.emplacement || "", entree: prov.entree || "" });
+  });
+
+  // Formulaires de devis
+  var aujourdhui = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+  document.querySelectorAll("form.devis").forEach(function (f) {
+    var d = f.querySelector('input[type="date"]');
+    if (d) d.min = aujourdhui;
+    f.querySelector('[name="page"]').value = location.pathname;
+    f.querySelector('[name="provenance"]').value = JSON.stringify(prov);
+    var statut = f.querySelector(".form-statut");
+
+    f.addEventListener("submit", function (e) {
+      e.preventDefault();
+      statut.className = "form-statut";
+      if (!f.checkValidity()) {
+        var champ = f.querySelector(":invalid");
+        statut.textContent = "Complétez le champ « " + champ.closest("label").firstChild.textContent.trim() + " » pour envoyer la demande.";
+        statut.classList.add("erreur");
+        champ.focus();
+        return;
+      }
+      if (!SITE.endpoint) {
+        statut.textContent = "L'envoi en ligne n'est pas encore activé. Appelez le " + SITE.tel + " : le standard répond 24h/24.";
+        statut.classList.add("erreur");
+        return;
+      }
+      var bouton = f.querySelector('button[type="submit"]');
+      bouton.disabled = true;
+      statut.textContent = "Envoi de votre demande…";
+      fetch(SITE.endpoint, { method: "POST", body: new FormData(f), headers: { Accept: "application/json" } })
+        .then(function (r) {
+          if (!r.ok) throw new Error();
+          suivre("demande_devis", { depart: f.depart.value, destination: f.destination.value, entree: prov.entree || "" });
+          f.reset();
+          f.querySelector('[name="page"]').value = location.pathname;
+          f.querySelector('[name="provenance"]').value = JSON.stringify(prov);
+          statut.textContent = "Demande envoyée. Le standard vous rappelle rapidement.";
+          statut.classList.add("ok");
+        })
+        .catch(function () {
+          statut.textContent = "La demande n'est pas partie. Réessayez ou appelez le " + SITE.tel + ".";
+          statut.classList.add("erreur");
+        })
+        .finally(function () { bouton.disabled = false; });
+    });
+  });
+})();

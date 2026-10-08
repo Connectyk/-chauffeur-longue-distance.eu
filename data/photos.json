@@ -1,0 +1,50 @@
+{
+  "_aide": "Chaque photo du dossier photos/ : texte alternatif (décrit ce qu'on voit) et point de cadrage (0 à 1, horizontal puis vertical). Les groupes décident quelle photo va sur quelle page.",
+  "photos": {
+    "berline-route-soir":     {"alt": "Berline noire sur une route en fin de journée", "cadrage": [0.6, 0.55]},
+    "chauffeur-portiere":     {"alt": "Chauffeur ouvrant la portière arrière d'une berline noire", "cadrage": [0.55, 0.5]},
+    "main-poignee":           {"alt": "Main d'un chauffeur ouvrant la portière d'une berline noire", "cadrage": [0.5, 0.3]},
+    "interieur-cuir-fauve":   {"alt": "Banquette arrière en cuir fauve, portière ouverte", "cadrage": [0.5, 0.55]},
+    "interieur-cuir-bleu":    {"alt": "Banquette arrière en cuir bleu nuit", "cadrage": [0.5, 0.45]},
+    "van-porte-ouverte":      {"alt": "Van noir, porte latérale ouverte sur l'habitacle", "cadrage": [0.5, 0.5]},
+    "avion-atterrissage":     {"alt": "Avion à l'atterrissage au coucher du soleil", "cadrage": [0.5, 0.5]},
+    "aeroport-attente":       {"alt": "Voyageur patientant devant les pistes d'un aéroport", "cadrage": [0.5, 0.55]},
+    "gare-bordeaux-saint-jean": {"alt": "Quai de la gare de Bordeaux Saint-Jean sous la verrière", "cadrage": [0.5, 0.5]},
+    "gare-lyon-saint-exupery":  {"alt": "Hall de la gare TGV de l'aéroport Lyon-Saint-Exupéry", "cadrage": [0.5, 0.45]},
+    "voie-rapide-nuit":       {"alt": "Circulation de nuit sur une voie rapide en ville", "cadrage": [0.5, 0.6]},
+    "autoroute-nuit":         {"alt": "Autoroute de nuit éclairée par des lampadaires", "cadrage": [0.5, 0.55]},
+    "col-enneige":            {"alt": "Route de col enneigée en montagne", "cadrage": [0.5, 0.78]},
+    "lacets-neige":           {"alt": "Lacets d'une route de montagne enneigée, vue du ciel", "cadrage": [0.5, 0.5]},
+    "route-alpine":           {"alt": "Route sinueuse dans un paysage alpin enneigé", "cadrage": [0.5, 0.65]},
+    "montagne-nuit":          {"alt": "Route de montagne éclairée de nuit", "cadrage": [0.6, 0.72]},
+    "mer-coucher-soleil":     {"alt": "Bord de mer méditerranéen au coucher du soleil", "cadrage": [0.5, 0.4]},
+    "corniche-mer":           {"alt": "Route en corniche au-dessus de la mer", "cadrage": [0.45, 0.6]},
+    "lacets-port":            {"alt": "Route en lacets au-dessus d'un petit port, vue du ciel", "cadrage": [0.5, 0.5]},
+    "quartier-affaires-soir": {"alt": "Tours d'un quartier d'affaires à la tombée de la nuit", "cadrage": [0.5, 0.5]}
+  },
+  "groupes": {
+    "accueil": ["berline-route-soir"],
+    "defaut": ["berline-route-soir", "interieur-cuir-fauve", "interieur-cuir-bleu", "main-poignee", "chauffeur-portiere"],
+    "aeroport": ["avion-atterrissage", "aeroport-attente"],
+    "gare": ["chauffeur-portiere", "main-poignee"],
+    "nuit": ["autoroute-nuit", "voie-rapide-nuit"],
+    "alpes": ["col-enneige", "lacets-neige", "route-alpine", "montagne-nuit"],
+    "riviera": ["mer-coucher-soleil", "corniche-mer", "lacets-port"],
+    "affaires": ["quartier-affaires-soir", "chauffeur-portiere"],
+    "hotels": ["chauffeur-portiere"],
+    "groupe": ["van-porte-ouverte"],
+    "urgence": ["voie-rapide-nuit"],
+    "h24": ["autoroute-nuit"],
+    "devis": ["main-poignee"]
+  },
+  "lieux": {
+    "Bordeaux Saint-Jean": "gare-bordeaux-saint-jean",
+    "Lyon Saint-Exupéry TGV": "gare-lyon-saint-exupery",
+    "Lyon-Saint-Exupéry": "gare-lyon-saint-exupery",
+    "Paris": "quartier-affaires-soir"
+  },
+  "zones": {
+    "alpes": ["Courchevel", "Megève", "Chamonix-Mont-Blanc", "Évian-les-Bains", "Verbier", "Crans-Montana", "Saint-Moritz", "Davos", "Sion", "Annecy", "Chambéry", "Grenoble", "Aix-les-Bains", "Sion Airport", "Engadin Airport", "Chambéry Savoie Mont Blanc", "Annecy Mont-Blanc", "Grenoble-Alpes-Isère"],
+    "riviera": ["Nice", "Cannes", "Monaco", "Saint-Tropez", "Antibes", "Menton", "Toulon", "Nice-Côte d'Azur", "Cannes-Mandelieu", "La Môle-Saint-Tropez", "Toulon-Hyères"]
+  }
+}

@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% from "_macros.html" import appel, formulaire, photo as ph %}
+{% block devis_link %}#devis{% endblock %}
+{% block main %}
+<div class="mise-en-page">
+<article class="principal">
+  <h1>{{ s.h1 }}</h1>
+  <p class="chapo">{{ s.intro }}</p>
+  <div class="actions">
+    <a class="bouton-appel" href="tel:{{ cfg.telephone_lien }}" data-emplacement="service-haut">Appeler le standard 24h/24</a>
+    <a class="bouton-second" href="#devis">Demander un devis</a>
+  </div>
+  {{ ph(photo) }}
+  {% for titre, paras in s.sections %}
+  <section class="bloc">
+    <h2>{{ titre }}</h2>
+    {% for p in paras %}<p>{{ p }}</p>{% endfor %}
+  </section>
+  {% endfor %}
+  {{ appel(cfg, "service-milieu") }}
+  <section class="bloc">
+    <h2>Questions fréquentes</h2>
+    {% for q, a in s.faq %}<details class="faq"><summary>{{ q }}</summary><p>{{ a }}</p></details>{% endfor %}
+  </section>
+  {% if exemples %}
+  <section class="bloc">
+    <h2>Exemples de trajets</h2>
+    <ul class="liste-trajets">{% for t in exemples %}<li><a href="{{ t.url }}">{{ t.dep.titre }} → {{ t.dest.titre }}</a><span class="km">{{ t.distance }} km</span></li>{% endfor %}</ul>
+  </section>
+  {% endif %}
+  <section class="bloc">
+    <h2>Nos autres services</h2>
+    <ul class="liste-simple">{% for o in autres %}<li><a href="{{ o.url }}">{{ o.nav }}</a></li>{% endfor %}</ul>
+  </section>
+</article>
+<aside class="cote">{{ formulaire() }}</aside>
+</div>
+{% endblock %}

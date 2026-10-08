@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% from "_macros.html" import formulaire %}
+{% block devis_link %}#devis{% endblock %}
+{% block main %}
+<div class="etroit">
+  <h1>Demander un devis</h1>
+  <p class="chapo">Décrivez votre trajet : le standard vous rappelle avec un devis personnalisé. Pour un départ dans les prochaines heures, appelez plutôt le <a href="tel:{{ cfg.telephone_lien }}" data-emplacement="devis-texte">{{ cfg.telephone_affiche }}</a>.</p>
+  {{ formulaire() }}
+</div>
+{% endblock %}

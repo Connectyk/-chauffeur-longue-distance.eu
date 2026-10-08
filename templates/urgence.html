@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% from "_macros.html" import appel, photo as ph %}
+{% block main %}
+<div class="etroit">
+  <h1>Chauffeur privé en urgence ou à la dernière minute</h1>
+  <p class="chapo">Vol annulé, train supprimé, rendez-vous avancé : appelez le standard. Il cherche immédiatement un chauffeur disponible dans le réseau le plus proche de vous.</p>
+  <a class="bouton-appel bouton-xl" href="tel:{{ cfg.telephone_lien }}" data-emplacement="urgence-haut">Appeler le {{ cfg.telephone_affiche }}</a>
+  {{ ph(photo) }}
+  <section class="bloc">
+    <h2>Pour aller plus vite au téléphone</h2>
+    <ul class="liste-simple liste-points">
+      <li>Le lieu exact de prise en charge (terminal, sortie de gare, adresse).</li>
+      <li>La destination et l'heure à laquelle vous devez y être.</li>
+      <li>Le nombre de passagers et de bagages.</li>
+    </ul>
+  </section>
+  <section class="bloc">
+    <h2>Départ immédiat, de jour comme de nuit</h2>
+    <p>Un chauffeur disponible maintenant, tôt le matin, tard le soir, le week-end ou les jours fériés : le standard téléphonique trouve le véhicule le plus proche et vous rappelle avec l'heure de prise en charge. Le prix vous est donné avant le départ, sans surprise.</p>
+    <p>Pour un rapatriement après un vol annulé, une grève ou un train supprimé, voir aussi notre service de <a href="{{ svc['rapatriement'].url }}">rapatriement par la route</a>.</p>
+  </section>
+  <section class="bloc">
+    <h2>Urgences aéroport</h2>
+    <p>Correspondance manquée, vol détourné, changement d'aéroport : nous assurons aussi les transferts directs entre aéroports, y compris sur de longues distances.</p>
+    <ul class="liste-colonnes">{% for l in aeroports %}<li><a href="{{ l.url }}">{{ l.titre }}</a></li>{% endfor %}</ul>
+  </section>
+  {{ appel(cfg, "urgence-bas", "Le standard répond maintenant") }}
+</div>
+{% endblock %}

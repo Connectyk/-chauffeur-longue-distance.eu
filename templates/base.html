@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ title }}</title>
+{% if meta %}<meta name="description" content="{{ meta }}">{% endif %}
+<link rel="canonical" href="{{ canonical }}">
+<meta property="og:title" content="{{ title }}">
+{% if meta %}<meta property="og:description" content="{{ meta }}">{% endif %}
+<meta property="og:url" content="{{ canonical }}">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="fr_FR">
+{% if photo %}<meta property="og:image" content="{{ base_url }}{{ photo.jpg }}">{% endif %}
+<meta name="theme-color" content="#13233A">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Overpass:wght@400;600;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ u('/static/style.css') }}">
+{% for s in schemas %}<script type="application/ld+json">{{ s|tojson }}</script>
+{% endfor %}
+{% if cfg.ga4_id %}
+<script async src="https://www.googletagmanager.com/gtag/js?id={{ cfg.ga4_id }}"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','{{ cfg.ga4_id }}');</script>
+{% endif %}
+</head>
+<body data-type="{{ page_type }}" data-trajet="{% block trajet_id %}{% endblock %}">
+<a class="skip" href="#contenu">Aller au contenu</a>
+<header class="entete">
+  <div class="entete-in">
+    <a class="marque" href="{{ u('/') }}">{{ cfg.nom_marque }}</a>
+    <nav class="nav" aria-label="Navigation principale">
+      <a href="{{ u('/aeroports/') }}">Aéroports</a>
+      <a href="{{ u('/gares/') }}">Gares</a>
+      <a href="{{ u('/villes/') }}">Villes</a>
+      <a href="{{ u('/chauffeur-prive/') }}">Trajets</a>
+      <a href="{{ u('/services/') }}">Services</a>
+    </nav>
+    <a class="tel-entete" href="tel:{{ cfg.telephone_lien }}" data-emplacement="entete">
+      <span class="tel-label">Standard 24h/24</span>
+      <span class="tel-num">{{ cfg.telephone_affiche }}</span>
+      <span class="tel-court">Appeler</span>
+    </a>
+  </div>
+</header>
+
+{% if crumbs|length > 1 %}
+<nav class="ariane" aria-label="Fil d'Ariane"><ol>
+  {% for n, link in crumbs %}<li>{% if not loop.last %}<a href="{{ link }}">{{ n }}</a>{% else %}<span aria-current="page">{{ n }}</span>{% endif %}</li>{% endfor %}
+</ol></nav>
+{% endif %}
+
+<main id="contenu">
+{% block main %}{% endblock %}
+</main>
+
+<footer class="pied">
+  <div class="pied-in">
+    <div>
+      <p class="pied-marque">{{ cfg.nom_marque }}</p>
+      <p>Chauffeur privé longue distance en France, en Suisse et en Belgique. Standard joignable jour et nuit.</p>
+      <p><a class="tel-pied" href="tel:{{ cfg.telephone_lien }}" data-emplacement="pied">{{ cfg.telephone_affiche }}</a></p>
+      <p><a href="mailto:{{ cfg.email }}">{{ cfg.email }}</a></p>
+    </div>
+    <ul class="pied-liens">
+      <li><a href="{{ u('/services/') }}">Nos services</a></li>
+      <li><a href="{{ u('/chauffeur-prive-urgence/') }}">Chauffeur en urgence</a></li>
+      <li><a href="{{ u('/chauffeur-prive-24h-24/') }}">Chauffeur 24h/24 et de nuit</a></li>
+      <li><a href="{{ u('/aeroports/') }}">Aéroports</a></li>
+      <li><a href="{{ u('/gares/') }}">Gares</a></li>
+      <li><a href="{{ u('/villes/') }}">Villes</a></li>
+      <li><a href="{{ u('/quartiers-affaires/') }}">Quartiers d'affaires</a></li>
+      <li><a href="{{ u('/hotels/') }}">Hôtels</a></li>
+      <li><a href="{{ u('/chauffeur-prive/') }}">Tous les trajets</a></li>
+      <li><a href="{{ u('/devis/') }}">Demander un devis</a></li>
+      <li><a href="{{ u('/contact/') }}">Contact</a></li>
+      <li><a href="{{ u('/mentions-legales/') }}">Mentions légales</a></li>
+      <li><a href="{{ u('/conditions-generales/') }}">Conditions générales de vente</a></li>
+      <li><a href="{{ u('/confidentialite/') }}">Confidentialité</a></li>
+    </ul>
+  </div>
+</footer>
+
+<div class="barre-appel">
+  <a class="barre-tel" href="tel:{{ cfg.telephone_lien }}" data-emplacement="barre-mobile">Appeler maintenant <small>Standard 24h/24</small></a>
+  <a class="barre-devis" href="{% block devis_link %}{{ u('/devis/') }}{% endblock %}">Devis</a>
+</div>
+<script>window.SITE={endpoint:{{ cfg.formulaire_endpoint|tojson }},tel:{{ cfg.telephone_affiche|tojson }}};</script>
+<script src="{{ u('/static/app.js') }}" defer></script>
+</body>
+</html>

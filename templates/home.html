@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% from "_macros.html" import formulaire, photo as ph %}
+{% block main %}
+<section class="accueil-hero">
+  <div class="hero-texte">
+    <h1>Chauffeur privé longue distance en France, Suisse et Belgique</h1>
+    <p class="chapo">Déplacements professionnels, transferts aéroports et gares, trajets de ville à ville. Le standard répond 24h/24 et 7j/7 et vous rappelle avec un devis personnalisé.</p>
+    <div class="actions">
+      <a class="bouton-appel" href="tel:{{ cfg.telephone_lien }}" data-emplacement="accueil-hero">Appeler maintenant</a>
+      <a class="bouton-second" href="{{ u('/devis/') }}">Demander un devis</a>
+    </div>
+  </div>
+  <div class="panneau panneau-multi" aria-label="Exemples de trajets">
+    {% for t in panneau %}
+    <a class="panneau-rangee" href="{{ t.url }}"><span>{{ t.dep.titre }} → {{ t.dest.titre }}</span><span class="panneau-km">{{ t.distance }} km</span></a>
+    {% endfor %}
+  </div>
+</section>
+<div class="accueil-photo">{{ ph(photo, eager=True, classe="photo photo-large") }}</div>
+
+<div class="accueil-corps">
+  <section class="bloc">
+    <h2>Nos services</h2>
+    <ul class="services">
+      {% for s in services %}<li><a href="{{ s.url }}">{{ s.nav }}</a><span>{{ s.court }}</span></li>{% endfor %}
+      <li><a href="{{ u('/hotels/') }}">Hôtels et conciergeries</a><span>Prise en charge à la réception, dépose à la porte.</span></li>
+      <li><a href="{{ u('/chauffeur-prive-24h-24/') }}">Nuit et dernière minute</a><span>Le standard répond à toute heure.</span></li>
+    </ul>
+  </section>
+
+  <section class="bloc">
+    <h2>Comment ça se passe</h2>
+    <ol class="etapes">
+      <li><strong>Vous appelez ou envoyez une demande.</strong> Départ, destination, date, passagers et bagages.</li>
+      <li><strong>Le standard vous confirme un chauffeur</strong> avec un devis personnalisé, sans paiement en ligne.</li>
+      <li><strong>Le chauffeur vous prend en charge</strong> à l'heure et à l'adresse convenues.</li>
+    </ol>
+  </section>
+
+  <section class="bloc">
+    <h2>Principaux aéroports</h2>
+    <ul class="liste-colonnes">{% for l in aeroports %}<li><a href="{{ l.url }}">{{ l.titre }}</a></li>{% endfor %}</ul>
+  </section>
+  <section class="bloc">
+    <h2>Principales villes</h2>
+    <ul class="liste-colonnes">{% for l in villes %}<li><a href="{{ l.url }}">{{ l.titre }}</a></li>{% endfor %}</ul>
+    <p><a href="{{ u('/chauffeur-prive/') }}">Voir les {{ nb_trajets }} trajets</a></p>
+  </section>
+</div>
+{% endblock %}

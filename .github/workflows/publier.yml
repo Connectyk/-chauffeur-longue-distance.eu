@@ -1,0 +1,75 @@
+name: Construire et publier le site
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  construire:
+    runs-on: ubuntu-latest
+    outputs:
+      pret: ${{ steps.verif.outputs.pret }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Décompresser le zip envoyé
+        run: |
+          zip=$(ls *.zip 2>/dev/null | head -n 1)
+          if [ -n "$zip" ]; then
+            unzip -q -o "$zip" -d /tmp/site
+            src=$(dirname "$(find /tmp/site -maxdepth 3 -name config.json | head -n 1)")
+            rm -rf "$src/.github"
+            cp -a "$src"/. ./
+            git rm -q "$zip"
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add -A
+            git commit -q -m "Décompression de $zip"
+            git push
+          fi
+
+      - id: verif
+        run: |
+          if [ -f config.json ]; then
+            echo "pret=oui" >> "$GITHUB_OUTPUT"
+          else
+            echo "pret=non" >> "$GITHUB_OUTPUT"
+            echo "Rien à construire pour l'instant : envoyez le zip du site."
+          fi
+
+      - if: steps.verif.outputs.pret == 'oui'
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - if: steps.verif.outputs.pret == 'oui'
+        run: pip install -r requirements.txt
+
+      - if: steps.verif.outputs.pret == 'oui'
+        run: python generator/build.py
+
+      - if: steps.verif.outputs.pret == 'oui'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  publier:
+    needs: construire
+    if: needs.construire.outputs.pret == 'oui'
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploiement.outputs.page_url }}
+    steps:
+      - id: deploiement
+        uses: actions/deploy-pages@v4

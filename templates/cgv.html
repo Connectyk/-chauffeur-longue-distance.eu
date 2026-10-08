@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% set e = cfg.entreprise %}
+{% block main %}
+<div class="etroit texte-legal">
+  <h1>Conditions générales de vente</h1>
+  <p>En vigueur au {{ date_maj }}.</p>
+
+  <h2>1. Objet</h2>
+  <p>Les présentes conditions générales de vente (CGV) régissent les prestations de transport de personnes avec chauffeur réservées auprès de {{ cfg.nom_marque }}, service exploité par {{ e.raison_sociale }} ({{ e.forme }}, SIRET {{ e.siret }}, {{ e.adresse }}), ci-après « le Prestataire ». Toute réservation implique l'acceptation sans réserve des présentes CGV.</p>
+
+  <h2>2. Nature du service</h2>
+  <p>Le Prestataire organise des trajets en voiture avec chauffeur : transferts aéroport et gare, trajets longue distance, mise à disposition, rapatriement et transport pour événements, en France, en Suisse et en Belgique. Les trajets sont réalisés par des chauffeurs professionnels partenaires du Prestataire, habilités au transport de personnes et couverts par une assurance adaptée. Le Prestataire reste l'interlocuteur unique du client pour la réservation, le prix et le suivi de la prestation.</p>
+
+  <h2>3. Réservation</h2>
+  <p>La réservation se fait par téléphone auprès du standard ou par le formulaire de demande de devis du site. Le client communique le lieu et l'heure de prise en charge, la destination, le nombre de passagers et de bagages, et toute information utile (numéro de vol ou de train, siège enfant, besoins particuliers).</p>
+  <p>Le Prestataire adresse un devis précisant le prix, le type de véhicule et les conditions de la prestation. La réservation est ferme à l'acceptation du devis par le client (par écrit, email ou message) puis à sa confirmation par le Prestataire.</p>
+
+  <h2>4. Prix</h2>
+  <p>Les prix sont établis sur devis, en euros, toutes taxes comprises. Le prix indiqué au devis est ferme pour le trajet décrit. Il comprend le véhicule, le chauffeur, le carburant et les péages, sauf mention contraire au devis.</p>
+  <p>Peuvent donner lieu à un supplément, s'ils n'étaient pas prévus au devis : un changement d'itinéraire ou un arrêt supplémentaire demandé par le client, une attente au-delà du temps inclus au devis, des frais de stationnement engagés à la demande du client, un nettoyage exceptionnel du véhicule.</p>
+
+  <h2>5. Paiement</h2>
+  <p>Les modalités de paiement (acompte, paiement avant ou après la prestation, moyens acceptés) sont précisées sur le devis. Une facture est remise pour chaque prestation. Pour les clients professionnels, tout retard de paiement entraîne les pénalités prévues par la loi et une indemnité forfaitaire de 40 € pour frais de recouvrement.</p>
+
+  <h2>6. Attente et retards</h2>
+  <p>Pour une prise en charge à un aéroport, le chauffeur suit l'heure d'arrivée réelle du vol communiqué à la réservation. Le temps d'attente inclus, compté à partir de l'arrivée du vol ou de l'heure convenue, est indiqué sur le devis. Au-delà, l'attente peut être facturée selon le tarif indiqué au devis.</p>
+  <p>Le Prestataire met tout en œuvre pour respecter les horaires. Il ne peut être tenu responsable des retards dus au trafic, aux conditions météorologiques, à des travaux ou à tout événement extérieur.</p>
+
+  <h2>7. Modification et annulation par le client</h2>
+  <p>Toute modification ou annulation doit être signalée au standard par téléphone ou par écrit.</p>
+  <p>Sauf conditions différentes indiquées sur le devis :</p>
+  <ul>
+    <li>annulation plus de 24 heures avant la prise en charge : sans frais, l'acompte éventuel est remboursé ;</li>
+    <li>annulation moins de 24 heures avant la prise en charge : 50 % du prix est dû ;</li>
+    <li>annulation moins de 2 heures avant, ou absence du client au lieu de prise en charge : 100 % du prix est dû.</li>
+  </ul>
+  <p>En cas de vol ou de train annulé, le client prévient le standard dès qu'il en a connaissance : la réservation est alors modifiée ou annulée sans frais si le chauffeur n'est pas encore parti.</p>
+
+  <h2>8. Annulation par le Prestataire</h2>
+  <p>Si le Prestataire ne peut assurer une prestation confirmée, il en informe le client au plus tôt et propose un chauffeur de remplacement. À défaut, les sommes versées sont intégralement remboursées.</p>
+
+  <h2>9. Obligations des passagers</h2>
+  <p>Le port de la ceinture de sécurité est obligatoire pour tous les passagers. Les enfants voyagent dans un siège adapté à leur âge et à leur taille, à demander lors de la réservation. Il est interdit de fumer et de vapoter dans le véhicule. Le chauffeur peut refuser ou interrompre une prestation en cas de comportement mettant en danger la sécurité, ou de dégradation du véhicule ; les frais de remise en état sont alors à la charge du client.</p>
+  <p>Les animaux sont acceptés uniquement s'ils ont été signalés à la réservation et acceptés par le Prestataire.</p>
+
+  <h2>10. Bagages et objets oubliés</h2>
+  <p>Le nombre et le volume des bagages sont indiqués à la réservation. Le Prestataire peut refuser des bagages non déclarés si le véhicule ne permet pas de les transporter en sécurité. Les objets oubliés dans le véhicule sont conservés et restitués sur demande, les frais d'envoi éventuels restant à la charge du client.</p>
+
+  <h2>11. Responsabilité</h2>
+  <p>Les passagers sont couverts par l'assurance de transport de personnes du chauffeur pendant la prestation. La responsabilité du Prestataire ne peut être engagée en cas de force majeure, ni pour les conséquences indirectes d'un retard (vol ou train manqué, rendez-vous perdu), sauf faute prouvée de sa part.</p>
+
+  <h2>12. Absence de droit de rétractation</h2>
+  <p>Conformément à l'article L221-28 du Code de la consommation, le droit de rétractation ne s'applique pas aux prestations de transport de personnes fournies à une date ou à une période déterminée. Les conditions d'annulation de l'article 7 s'appliquent.</p>
+
+  <h2>13. Réclamations et médiation</h2>
+  <p>Toute réclamation est à adresser par email à <a href="mailto:{{ cfg.email }}">{{ cfg.email }}</a>. Si aucune solution amiable n'est trouvée, le client consommateur peut recourir gratuitement au médiateur de la consommation : {{ e.mediateur }}.</p>
+
+  <h2>14. Données personnelles</h2>
+  <p>Les données transmises lors de la réservation sont utilisées pour organiser la prestation. Voir la <a href="{{ u('/confidentialite/') }}">politique de confidentialité</a>.</p>
+
+  <h2>15. Droit applicable</h2>
+  <p>Les présentes CGV sont soumises au droit français. En cas de litige avec un client professionnel, compétence est attribuée aux tribunaux du ressort du siège du Prestataire. Le client consommateur peut saisir la juridiction de son choix dans les conditions prévues par la loi.</p>
+</div>
+{% endblock %}

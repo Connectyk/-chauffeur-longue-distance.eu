@@ -1,0 +1,25 @@
+{
+  "nom_marque": "Chauffeur Longue Distance",
+  "url_site": "https://www.chauffeur-longue-distance.eu",
+  "domaine_cname": "www.chauffeur-longue-distance.eu",
+  "telephone_affiche": "+33 9 72 19 76 82",
+  "telephone_lien": "+33972197682",
+  "email": "contact@chauffeur-longue-distance.eu",
+  "formulaire_endpoint": "",
+  "ga4_id": "",
+  "adresse_entreprise": null,
+  "phases_publiees": [
+    "Phase 1"
+  ],
+  "fichier_donnees": "data/master_seo.xlsx",
+  "prefixe_langue": "",
+  "dossier_sortie": "_site",
+  "entreprise": {
+    "raison_sociale": "Connect'yk",
+    "forme": "Entreprise individuelle (micro-entreprise)",
+    "responsable": "Valentin MARCHAL",
+    "siret": "889 896 387 00020",
+    "adresse": "4 rue de Fontaine-lès-Dijon, 21000 Dijon, France",
+    "mediateur": "CM2C (Centre de la Médiation de la Consommation de Conciliateurs de Justice), www.cm2c.net"
+  }
+}

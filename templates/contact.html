@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% from "_macros.html" import formulaire, photo as ph %}
+{% block devis_link %}#devis{% endblock %}
+{% block main %}
+<div class="etroit">
+  <h1>Contact</h1>
+  <p class="chapo">Standard joignable 24h/24 et 7j/7.</p>
+  <a class="bouton-appel bouton-xl" href="tel:{{ cfg.telephone_lien }}" data-emplacement="contact">Appeler le {{ cfg.telephone_affiche }}</a>
+  {{ ph(photo) }}
+  <p>Email : <a href="mailto:{{ cfg.email }}">{{ cfg.email }}</a></p>
+  {{ formulaire() }}
+</div>
+{% endblock %}

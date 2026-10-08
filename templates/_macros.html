@@ -1,0 +1,45 @@
+{% macro appel(cfg, emplacement, titre="Besoin d'un chauffeur maintenant ?") %}
+<div class="appel">
+  <p class="appel-titre">{{ titre }}</p>
+  <p>Le standard répond jour et nuit et trouve le chauffeur disponible.</p>
+  <a class="bouton-appel" href="tel:{{ cfg.telephone_lien }}" data-emplacement="{{ emplacement }}">Appeler le {{ cfg.telephone_affiche }}</a>
+</div>
+{% endmacro %}
+
+{% macro formulaire(depart="", destination="", id="devis") %}
+<form class="devis" id="{{ id }}" method="post" novalidate>
+  <h2 class="form-titre">Demander un devis</h2>
+  <p class="form-note">Sans paiement en ligne. Le standard vous rappelle avec un devis personnalisé.</p>
+  <div class="champs">
+    <label>Départ<input name="depart" required value="{{ depart }}" autocomplete="off"></label>
+    <label>Destination<input name="destination" required value="{{ destination }}" autocomplete="off"></label>
+    <label class="demi">Date<input type="date" name="date" required></label>
+    <label class="demi">Heure<input type="time" name="heure" required></label>
+    <label class="demi">Passagers<input type="number" name="passagers" min="1" max="50" value="1" required></label>
+    <label class="demi">Bagages<input type="number" name="bagages" min="0" max="50" value="1"></label>
+    <label>Nom<input name="nom" required autocomplete="name"></label>
+    <label>Téléphone<input type="tel" name="telephone" required autocomplete="tel"></label>
+    <label>Email<input type="email" name="email" autocomplete="email"></label>
+    <label>Informations complémentaires<textarea name="informations" rows="3" placeholder="Numéro de vol ou de train, siège enfant, trajet retour…"></textarea></label>
+  </div>
+  <input type="hidden" name="page" value="">
+  <input type="hidden" name="provenance" value="">
+  <p class="form-note form-legal">En envoyant cette demande, vous acceptez que vos informations soient utilisées pour établir votre devis (<a href="/confidentialite/">confidentialité</a>, <a href="/conditions-generales/">CGV</a>).</p>
+  <button type="submit" class="bouton-devis">Demander mon devis</button>
+  <p class="form-statut" role="status" aria-live="polite"></p>
+</form>
+{% endmacro %}
+
+{% macro liste_trajets(ts, cote) %}
+<ul class="liste-trajets">
+{% for t in ts %}<li><a href="{{ t.url }}">{% if cote == 'dest' %}{{ t.dest.titre }}{% elif cote == 'dep' %}{{ t.dep.titre }}{% else %}{{ t.dep.titre }} → {{ t.dest.titre }}{% endif %}</a><span class="km">{{ t.distance }} km</span></li>
+{% endfor %}
+</ul>
+{% endmacro %}
+
+{% macro photo(p, eager=False, classe="photo") %}{% if p %}
+<figure class="{{ classe }}"><picture>
+  <source type="image/webp" srcset="{{ p.webp }}" sizes="(min-width:1000px) 48rem, 100vw">
+  <img src="{{ p.jpg }}" alt="{{ p.alt }}" width="{{ p.largeur }}" height="{{ p.hauteur }}" {% if eager %}fetchpriority="high"{% else %}loading="lazy"{% endif %} decoding="async">
+</picture></figure>
+{% endif %}{% endmacro %}

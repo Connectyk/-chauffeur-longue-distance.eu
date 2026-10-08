@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block main %}
+<div class="etroit">
+  <h1>Cette page n'existe pas</h1>
+  <p class="chapo">Le trajet que vous cherchez n'a peut-être pas encore de page, mais nous le réalisons sûrement. Appelez le standard ou consultez la liste des trajets.</p>
+  <div class="actions">
+    <a class="bouton-appel" href="tel:{{ cfg.telephone_lien }}" data-emplacement="404">Appeler le standard 24h/24</a>
+    <a class="bouton-second" href="{{ u('/chauffeur-prive/') }}">Voir les trajets</a>
+  </div>
+</div>
+{% endblock %}

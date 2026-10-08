@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% from "_macros.html" import liste_trajets %}
+{% block main %}
+<div class="etroit">
+  <h1>Tous nos trajets</h1>
+  <p class="chapo">Trajets longue distance, transferts aéroports et gares. Votre trajet n'apparaît pas ? Nous le réalisons aussi : appelez le standard.</p>
+  {% for l, ts in groupes %}
+  <section class="bloc">
+    <h2>Au départ {{ l.forme_de }}</h2>
+    {{ liste_trajets(ts, 'dest') }}
+  </section>
+  {% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% set e = cfg.entreprise %}
+{% block main %}
+<div class="etroit texte-legal">
+  <h1>Politique de confidentialité</h1>
+  <p>En vigueur au {{ date_maj }}.</p>
+  <h2>Responsable du traitement</h2>
+  <p>{{ e.raison_sociale }}, {{ e.adresse }}. Contact : <a href="mailto:{{ cfg.email }}">{{ cfg.email }}</a>.</p>
+  <h2>Données collectées</h2>
+  <p>Lorsque vous demandez un devis ou réservez : nom, téléphone, email, lieux et horaires de prise en charge et de dépose, nombre de passagers et de bagages, informations que vous choisissez d'ajouter (numéro de vol ou de train, besoins particuliers). Le formulaire enregistre aussi la page d'où vous écrivez et la provenance de votre visite (moteur de recherche, campagne).</p>
+  <h2>Utilisation</h2>
+  <p>Ces données servent uniquement à établir votre devis, organiser et facturer la prestation, et vous contacter à son sujet. Elles sont transmises au chauffeur chargé du trajet, dans la limite de ce qui est nécessaire. Elles ne sont jamais vendues.</p>
+  <p>Base légale : l'exécution de mesures précontractuelles et du contrat, et les obligations comptables pour les factures.</p>
+  <h2>Durée de conservation</h2>
+  <p>Les demandes de devis sans suite sont supprimées au bout de 3 ans. Les données liées à une prestation sont conservées le temps de la relation commerciale, et les factures pendant 10 ans conformément aux obligations comptables.</p>
+  <h2>Prestataires techniques</h2>
+  <p>Le site est hébergé par GitHub (États-Unis). Les demandes envoyées par le formulaire transitent par le service d'envoi de formulaires utilisé par le site. Ces prestataires peuvent traiter des données hors de l'Union européenne, avec les garanties prévues par la réglementation.</p>
+  <h2>Mesure d'audience</h2>
+  <p>Si une mesure d'audience est activée, elle sert uniquement à savoir quelles pages génèrent des appels et des demandes. Lorsqu'elle dépose des cookies, votre consentement est demandé au préalable.</p>
+  <h2>Vos droits</h2>
+  <p>Vous pouvez accéder à vos données, les rectifier, les effacer, vous opposer à leur traitement ou en demander la portabilité en écrivant à <a href="mailto:{{ cfg.email }}">{{ cfg.email }}</a>. Vous pouvez aussi adresser une réclamation à la CNIL (cnil.fr).</p>
+</div>
+{% endblock %}

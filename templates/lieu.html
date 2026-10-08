@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% from "_macros.html" import appel, formulaire, liste_trajets, photo as ph %}
+{% block devis_link %}#devis{% endblock %}
+{% block main %}
+<div class="mise-en-page">
+<article class="principal">
+  <h1>Chauffeur privé {{ l.titre }}</h1>
+  {% if l.type_detail %}<p class="sous-titre">{{ l.type_detail }}{% if l.code %} ({{ l.code }}){% endif %}{% if l.ville and l.categorie != 'Ville' %}, {{ l.ville }}{% endif %}</p>{% endif %}
+  <p class="chapo">{{ intro }}</p>
+  <div class="actions">
+    <a class="bouton-appel" href="tel:{{ cfg.telephone_lien }}" data-emplacement="lieu-haut">Appeler le standard 24h/24</a>
+    <a class="bouton-second" href="#devis">Demander un devis</a>
+  </div>
+  {{ ph(photo) }}
+  {% for lab, ts in departs %}
+  <section class="bloc">
+    <h2>{{ 'Depuis ' ~ l.titre if l.categorie == 'Ville' else 'Au départ ' ~ l.forme_de }} : {{ lab|lower }}</h2>
+    {{ liste_trajets(ts, 'dest') }}
+  </section>
+  {% endfor %}
+  {% for lab, ts in arrivees %}
+  <section class="bloc">
+    <h2>Vers {{ l.forme_vers }} depuis les {{ lab|lower }}</h2>
+    {{ liste_trajets(ts, 'dep') }}
+  </section>
+  {% endfor %}
+  {{ appel(cfg, "lieu-milieu") }}
+  <section class="bloc">
+    <h2>Nos services {{ 'à ' ~ l.cle if l.categorie == 'Ville' else l.forme_de.replace('de ', 'depuis ', 1) if l.forme_de.startswith('de ') else 'depuis ' ~ l.forme_vers }}</h2>
+    <ul class="liste-simple">{% for s in svc_liens %}<li><a href="{{ s.url }}">{{ s.nav }}</a> : {{ s.court|lower }}</li>{% endfor %}</ul>
+  </section>
+  {% if infra or ville_page or quartiers or hotels_url %}
+  <section class="bloc">
+    <h2>À proximité</h2>
+    <ul class="liste-simple">
+      {% if ville_page %}<li><a href="{{ ville_page.url }}">Chauffeur privé {{ ville_page.titre }}</a></li>{% endif %}
+      {% for x in infra %}<li><a href="{{ x.url }}">{{ x.titre }}</a></li>{% endfor %}
+      {% for q in quartiers %}<li><a href="{{ q.url }}">Quartier d'affaires : {{ q.nom }}</a></li>{% endfor %}
+      {% if hotels_url %}<li><a href="{{ hotels_url }}">Hôtels de {{ l.ville }}</a></li>{% endif %}
+    </ul>
+  </section>
+  {% endif %}
+</article>
+<aside class="cote">{{ formulaire(l.titre if l.categorie != 'Ville' else l.cle, "") }}</aside>
+</div>
+{% endblock %}

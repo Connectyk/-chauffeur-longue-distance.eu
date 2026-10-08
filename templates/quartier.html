@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% from "_macros.html" import appel, formulaire, liste_trajets, photo as ph %}
+{% block devis_link %}#devis{% endblock %}
+{% block main %}
+<div class="mise-en-page">
+<article class="principal">
+  <h1>Chauffeur privé {{ q.nom }}</h1>
+  <p class="sous-titre">{{ q.type }}, {{ q.ville }}</p>
+  <p class="chapo">Réunion, séminaire, conférence ou visite d'entreprise à {{ q.nom }} : votre chauffeur vous dépose à l'adresse exacte du rendez-vous et vous attend si besoin. Le standard répond 24h/24.</p>
+  <div class="actions">
+    <a class="bouton-appel" href="tel:{{ cfg.telephone_lien }}" data-emplacement="quartier-haut">Appeler le standard 24h/24</a>
+    <a class="bouton-second" href="#devis">Demander un devis</a>
+  </div>
+  {{ ph(photo) }}
+  <section class="bloc">
+    <h2>Rejoindre {{ q.nom }} depuis un aéroport ou une gare</h2>
+    <p>Indiquez l'adresse de votre rendez-vous et l'heure à laquelle vous devez y être : le standard calcule l'heure de prise en charge avec une marge pour la circulation aux heures de pointe.</p>
+    {% if infra %}<ul class="liste-simple">{% for x in infra %}<li><a href="{{ x.url }}">{{ x.titre }}</a></li>{% endfor %}</ul>{% endif %}
+  </section>
+  {% if arrivees %}
+  <section class="bloc">
+    <h2>Trajets longue distance vers {{ q.ville }}</h2>
+    {{ liste_trajets(arrivees, 'dep') }}
+  </section>
+  {% endif %}
+  {{ appel(cfg, "quartier-milieu") }}
+  <section class="bloc">
+    <h2>À proximité</h2>
+    <ul class="liste-simple">
+      <li><a href="{{ v.url }}">Chauffeur privé {{ v.titre }}</a></li>
+      {% if hotels_url %}<li><a href="{{ hotels_url }}">Hôtels de {{ q.ville }}</a></li>{% endif %}
+    </ul>
+  </section>
+</article>
+<aside class="cote">{{ formulaire("", q.nom ~ ", " ~ q.ville) }}</aside>
+</div>
+{% endblock %}

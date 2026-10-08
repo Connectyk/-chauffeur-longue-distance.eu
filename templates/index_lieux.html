@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block main %}
+<div class="etroit">
+  <h1>{{ label }} desservis</h1>
+  {% for pays, items in groupes %}
+  <section class="bloc">
+    <h2>{{ pays }}</h2>
+    <ul class="liste-colonnes">{% for l in items %}<li><a href="{{ l.url }}">{{ l.titre }}</a></li>{% endfor %}</ul>
+  </section>
+  {% endfor %}
+</div>
+{% endblock %}

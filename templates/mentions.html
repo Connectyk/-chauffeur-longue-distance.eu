@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% set e = cfg.entreprise %}
+{% block main %}
+<div class="etroit texte-legal">
+  <h1>Mentions légales</h1>
+  <h2>Éditeur du site</h2>
+  <p>Le site {{ cfg.url_site }} est édité par {{ e.raison_sociale }}, {{ e.forme }}, représentée par {{ e.responsable }}.<br>
+  SIRET : {{ e.siret }}<br>
+  Adresse : {{ e.adresse }}<br>
+  Téléphone : <a href="tel:{{ cfg.telephone_lien }}">{{ cfg.telephone_affiche }}</a><br>
+  Email : <a href="mailto:{{ cfg.email }}">{{ cfg.email }}</a></p>
+  <p>Directeur de la publication : {{ e.responsable }}.</p>
+  <h2>Activité</h2>
+  <p>{{ cfg.nom_marque }} est un service de réservation de transport de personnes avec chauffeur. Les prestations sont réalisées par des chauffeurs professionnels partenaires, dans les conditions décrites dans les <a href="{{ u('/conditions-generales/') }}">conditions générales de vente</a>.</p>
+  <h2>Hébergement</h2>
+  <p>Le site est hébergé par GitHub, Inc. (service GitHub Pages), 88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, États-Unis.</p>
+  <h2>Propriété intellectuelle</h2>
+  <p>Les textes et la mise en page du site sont la propriété de l'éditeur. Les photographies proviennent de la banque d'images Pexels et sont utilisées selon sa licence.</p>
+  <h2>Données personnelles</h2>
+  <p>Voir la <a href="{{ u('/confidentialite/') }}">politique de confidentialité</a>.</p>
+</div>
+{% endblock %}

@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block main %}
+<div class="etroit">
+  <h1>{{ label }}</h1>
+  {% for pays, items in groupes %}
+  <section class="bloc">
+    <h2>{{ pays }}</h2>
+    <ul class="liste-colonnes">{% for it in items %}<li><a href="{{ it.url }}">{{ it.nom }}{% if kind == 'quartier' %} <span class="km">{{ it.ville }}</span>{% endif %}</a></li>{% endfor %}</ul>
+  </section>
+  {% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% from "_macros.html" import appel, formulaire, liste_trajets, photo as ph %}
+{% block trajet_id %}{{ t.dep.titre }} → {{ t.dest.titre }}{% endblock %}
+{% block devis_link %}#devis{% endblock %}
+{% block main %}
+<div class="mise-en-page">
+<article class="principal">
+  <h1>{{ title.replace(' | 24h/24','') }}</h1>
+  <div class="panneau">
+    <p class="panneau-ligne">{{ t.dep.titre }}</p>
+    <svg class="panneau-fleche" viewBox="0 0 48 24" aria-hidden="true"><path d="M2 12h38M30 3l12 9-12 9" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="square"/></svg>
+    <p class="panneau-ligne panneau-vers">{{ t.dest.titre }}</p>
+    <p class="panneau-cartouche"><span>{% if not t.distance_reelle %}≈ {% endif %}{{ t.distance }} km</span><span>{{ t.duree }} de route</span></p>
+  </div>
+  <p class="chapo">{{ c.intro }}</p>
+  <div class="actions">
+    <a class="bouton-appel" href="tel:{{ cfg.telephone_lien }}" data-emplacement="trajet-haut">Appeler le standard 24h/24</a>
+    <a class="bouton-second" href="#devis">Demander un devis</a>
+  </div>
+  {{ ph(photo) }}
+
+  {% for titre, paras in c.sections %}
+  <section class="bloc">
+    <h2>{{ titre }}</h2>
+    {% for p in paras %}<p>{{ p }}</p>{% endfor %}
+    {% if titre == "Bagages et véhicule" %}{{ ph(van, classe="photo photo-petite") }}{% endif %}
+    {% if titre == "Dépose" and retour %}<p>Trajet retour : <a href="{{ retour.url }}">{{ retour.dep.titre }} → {{ retour.dest.titre }}</a>.</p>{% endif %}
+  </section>
+  {% endfor %}
+
+  {{ appel(cfg, "trajet-milieu") }}
+
+  <section class="bloc">
+    <h2>Questions fréquentes</h2>
+    {% for q, a in c.faq %}<details class="faq"><summary>{{ q }}</summary><p>{{ a }}</p></details>{% endfor %}
+  </section>
+
+  {% if autres_depuis %}
+  <section class="bloc">
+    <h2>Autres trajets au départ {{ t.dep.forme_de }}</h2>
+    {{ liste_trajets(autres_depuis, 'dest') }}
+  </section>
+  {% endif %}
+  {% if autres_vers %}
+  <section class="bloc">
+    <h2>Autres trajets vers {{ t.dest.forme_vers }}</h2>
+    {{ liste_trajets(autres_vers, 'dep') }}
+  </section>
+  {% endif %}
+  <section class="bloc">
+    <h2>Nos services</h2>
+    <ul class="liste-simple">{% for s in svc_liens %}<li><a href="{{ s.url }}">{{ s.nav }}</a> : {{ s.court|lower }}</li>{% endfor %}</ul>
+  </section>
+  {% if liens_infra or hotels_url or quartiers %}
+  <section class="bloc">
+    <h2>À voir aussi</h2>
+    <ul class="liste-simple">
+      {% for l in liens_infra %}<li><a href="{{ l.url }}">Chauffeur privé {{ l.titre }}</a></li>{% endfor %}
+      {% if hotels_url %}<li><a href="{{ hotels_url }}">Transferts depuis les hôtels de {{ ville_dest }}</a></li>{% endif %}
+      {% for q in quartiers %}<li><a href="{{ q.url }}">{{ q.nom }}</a></li>{% endfor %}
+    </ul>
+  </section>
+  {% endif %}
+</article>
+<aside class="cote">
+  {{ formulaire(t.dep.titre, t.dest.titre) }}
+</aside>
+</div>
+{% endblock %}

@@ -1,0 +1,169 @@
+/* Palette : bleu des panneaux autoroutiers, nuit, ambre des lampes au sodium */
+:root{
+  --route:#1B4F9C; --route-fonce:#153E7A;
+  --nuit:#13233A; --bitume:#566173;
+  --sodium:#F2A33A; --sodium-fonce:#D98A1F;
+  --fond:#F2F4F7; --blanc:#FFFFFF; --ligne:#D9DEE5;
+  --police:"Overpass",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  --rayon:10px;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;font-family:var(--police);font-size:1.0625rem;line-height:1.6;color:var(--nuit);background:var(--fond);padding-bottom:4.5rem}
+@media (min-width:900px){body{padding-bottom:0}}
+img{max-width:100%}
+a{color:var(--route)}
+a:hover{color:var(--route-fonce)}
+:focus-visible{outline:3px solid var(--sodium);outline-offset:2px}
+.skip{position:absolute;left:-999px;top:0;background:var(--blanc);padding:.5rem 1rem;z-index:20}
+.skip:focus{left:1rem}
+
+h1{font-size:clamp(1.9rem,4.6vw,2.9rem);line-height:1.1;font-weight:800;letter-spacing:-.015em;margin:0 0 1rem;max-width:22ch}
+h2{font-size:1.35rem;line-height:1.25;font-weight:800;margin:0 0 .6rem}
+p{margin:0 0 1rem;max-width:68ch}
+.chapo{font-size:1.2rem;color:var(--nuit)}
+.sous-titre{color:var(--bitume);margin-top:-.5rem}
+
+/* En-tête */
+.entete{background:var(--nuit);color:var(--blanc)}
+.entete-in{max-width:76rem;margin:0 auto;padding:.75rem 1.25rem;display:flex;align-items:center;gap:1.5rem}
+.marque{white-space:nowrap;color:var(--blanc);text-decoration:none;font-weight:800;font-size:1.25rem;letter-spacing:-.01em}
+.nav{display:none;gap:1.25rem;margin-right:auto}
+.nav a{color:#C9D3E1;text-decoration:none;font-weight:600}
+.nav a:hover{color:var(--blanc)}
+.tel-entete{margin-left:auto;display:flex;flex-direction:column;align-items:flex-end;text-decoration:none;color:var(--sodium);line-height:1.15}
+.tel-label{font-size:.8rem;color:#C9D3E1}
+.tel-num{font-weight:800;font-size:1.1rem;white-space:nowrap}
+@media (max-width:899px){.tel-label{display:none}.tel-num{font-size:1rem}}
+.tel-court{display:none;font-weight:800}
+@media (max-width:520px){.tel-num{display:none}.tel-court{display:inline-block;background:var(--sodium);color:var(--nuit);border-radius:8px;padding:.35rem .75rem}.marque{font-size:.95rem;min-width:0;overflow:hidden;text-overflow:ellipsis}.tel-entete{flex-shrink:0}.entete-in{gap:.75rem;padding:.7rem 1rem}.tel-court{padding:.3rem .6rem;font-size:.9rem}}
+@media (min-width:900px){.nav{display:flex}.tel-entete{margin-left:0}}
+
+/* Fil d'Ariane */
+.ariane{max-width:76rem;margin:0 auto;padding:.75rem 1.25rem 0;font-size:.9rem;color:var(--bitume)}
+.ariane ol{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:.25rem .5rem}
+.ariane li+li::before{content:"›";margin-right:.5rem;color:var(--bitume)}
+
+/* Mise en page */
+main{display:block}
+.mise-en-page,.etroit{max-width:76rem;margin:0 auto;padding:1.5rem 1.25rem 3rem}
+.etroit{max-width:48rem}
+.mise-en-page{display:grid;gap:2.5rem}
+@media (min-width:1000px){
+  .mise-en-page{grid-template-columns:minmax(0,1fr) 22rem;align-items:start}
+  .cote{position:sticky;top:1.25rem}
+}
+.principal{max-width:48rem}
+.bloc{margin-top:2.25rem}
+
+/* Panneau autoroutier : l'élément signature */
+.panneau{background:var(--route);color:var(--blanc);border-radius:14px;padding:1.25rem 1.4rem 1.1rem;
+  box-shadow:inset 0 0 0 4px var(--route),inset 0 0 0 6px var(--blanc);margin:1.25rem 0 1.5rem;max-width:34rem}
+.panneau-ligne{font-weight:800;font-size:clamp(1.3rem,3.6vw,1.75rem);line-height:1.15;margin:0;letter-spacing:-.005em}
+.panneau-fleche{display:block;width:3rem;height:1.5rem;margin:.45rem 0;color:var(--blanc)}
+.panneau-cartouche{display:flex;flex-wrap:wrap;gap:.5rem;margin:1rem 0 0}
+.panneau-cartouche span{background:var(--blanc);color:var(--route);font-weight:800;border-radius:6px;padding:.2rem .6rem;font-size:1rem}
+.panneau-multi{padding:.6rem 1.4rem;margin:0}
+.panneau-rangee{display:flex;justify-content:space-between;gap:1rem;color:var(--blanc);text-decoration:none;font-weight:800;
+  font-size:1.15rem;padding:.7rem 0;border-bottom:2px solid rgba(255,255,255,.35)}
+.panneau-rangee:last-child{border-bottom:0}
+.panneau-rangee:hover{color:var(--sodium)}
+.panneau-km{white-space:nowrap}
+
+/* Accueil */
+.accueil-corps{max-width:76rem;margin:0 auto;padding:1rem 1.25rem 3rem}
+.accueil-corps>.bloc{max-width:52rem}
+.accueil-hero{max-width:76rem;margin:0 auto;padding:2.5rem 1.25rem 1rem;display:grid;gap:2rem;align-items:center}
+@media (min-width:1000px){.accueil-corps{max-width:76rem;margin:0 auto;padding:1rem 1.25rem 3rem}
+.accueil-corps>.bloc{max-width:52rem}
+.accueil-hero{grid-template-columns:minmax(0,1fr) 30rem;padding-top:4rem}}
+.services{list-style:none;padding:0;margin:0;display:grid;gap:1rem}
+@media (min-width:700px){.services{grid-template-columns:1fr 1fr}}
+.services li{border-left:4px solid var(--route);padding:.15rem 0 .15rem .9rem}
+.services a{font-weight:800;display:block}
+.services span{color:var(--bitume)}
+.etapes{padding-left:1.4rem;margin:0}
+.etapes li{margin-bottom:.6rem}
+
+/* Boutons */
+.actions{display:flex;flex-wrap:wrap;gap:.75rem;margin:1.25rem 0}
+.bouton-appel,.bouton-second,.bouton-devis{display:inline-block;font-family:inherit;font-weight:800;font-size:1.05rem;text-decoration:none;
+  border-radius:var(--rayon);padding:.85rem 1.3rem;border:0;cursor:pointer;line-height:1.2}
+.bouton-appel{background:var(--sodium);color:var(--nuit)}
+.bouton-appel:hover{background:var(--sodium-fonce);color:var(--nuit)}
+.bouton-second{background:transparent;color:var(--route);box-shadow:inset 0 0 0 2px var(--route)}
+.bouton-xl{font-size:1.25rem;padding:1.1rem 1.6rem;margin:.5rem 0 1rem}
+
+/* Encart appel */
+.appel{background:var(--nuit);color:var(--blanc);border-radius:var(--rayon);padding:1.4rem;margin-top:2.25rem}
+.appel p{color:#C9D3E1}
+.appel-titre{font-weight:800;font-size:1.3rem;color:var(--blanc)!important;margin-bottom:.3rem}
+
+/* Listes */
+.liste-trajets{list-style:none;margin:0;padding:0;columns:1}
+@media (min-width:640px){.liste-trajets{columns:2;column-gap:2rem}}
+.liste-trajets li{display:flex;justify-content:space-between;gap:.75rem;padding:.45rem 0;border-bottom:1px solid var(--ligne);break-inside:avoid}
+.km{color:var(--bitume);font-size:.9rem;white-space:nowrap}
+.liste-simple{margin:0;padding-left:1.1rem}
+.liste-simple li{margin-bottom:.35rem}
+.liste-colonnes{list-style:none;margin:0;padding:0;columns:2;column-gap:2rem}
+@media (min-width:700px){.liste-colonnes{columns:3}}
+.liste-colonnes li{padding:.3rem 0;break-inside:avoid}
+.liste-hotels{list-style:none;margin:0 0 1rem;padding:0}
+.liste-hotels li{padding:.55rem 0;border-bottom:1px solid var(--ligne);display:flex;flex-direction:column}
+.h-nom{font-weight:600}.h-info{color:var(--bitume);font-size:.92rem}
+
+/* FAQ */
+.faq{border-bottom:1px solid var(--ligne);padding:.4rem 0}
+.faq summary{cursor:pointer;font-weight:600;padding:.4rem 0}
+.faq p{margin:.3rem 0 .6rem}
+
+/* Formulaire */
+.devis{background:var(--blanc);border:1px solid var(--ligne);border-radius:var(--rayon);padding:1.4rem;scroll-margin-top:1rem}
+.form-titre{margin-bottom:.25rem}
+.form-note{color:var(--bitume);font-size:.95rem}
+.champs{display:grid;grid-template-columns:1fr 1fr;gap:.8rem}
+.champs label{grid-column:1/-1;display:flex;flex-direction:column;font-weight:600;font-size:.95rem;gap:.25rem}
+.champs label.demi{grid-column:auto}
+.champs input,.champs textarea{font:inherit;font-weight:400;padding:.65rem .7rem;border:1.5px solid var(--ligne);border-radius:8px;background:var(--blanc);color:var(--nuit);width:100%}
+.champs input:focus,.champs textarea:focus{border-color:var(--route);outline:none;box-shadow:0 0 0 3px rgba(27,79,156,.2)}
+.bouton-devis{background:var(--route);color:var(--blanc);width:100%;margin-top:1rem}
+.bouton-devis:hover{background:var(--route-fonce)}
+.form-statut{margin:.75rem 0 0;font-weight:600}
+.form-statut.erreur{color:#B3261E}
+.form-statut.ok{color:#1E7A3D}
+
+/* Pied */
+.pied{background:var(--nuit);color:#C9D3E1;margin-top:2rem}
+.pied-in{max-width:76rem;margin:0 auto;padding:2.5rem 1.25rem;display:grid;gap:2rem}
+@media (min-width:800px){.pied-in{grid-template-columns:1fr 1.4fr}}
+.pied a{color:var(--blanc)}
+.pied-marque{color:var(--blanc);font-weight:800;font-size:1.2rem}
+.tel-pied{color:var(--sodium)!important;font-weight:800;font-size:1.3rem;text-decoration:none}
+.pied-liens{list-style:none;margin:0;padding:0;columns:2;column-gap:2rem}
+.pied-liens li{padding:.25rem 0}
+
+/* Barre d'appel mobile */
+.barre-appel{position:fixed;left:0;right:0;bottom:0;display:flex;gap:.5rem;padding:.6rem;background:var(--nuit);z-index:10;
+  padding-bottom:calc(.6rem + env(safe-area-inset-bottom,0px))}
+.barre-tel{flex:1;background:var(--sodium);color:var(--nuit);text-decoration:none;font-weight:800;font-size:1.1rem;border-radius:var(--rayon);
+  padding:.7rem 1rem;display:flex;flex-direction:column;align-items:center;line-height:1.15}
+.barre-tel small{font-weight:600;font-size:.78rem}
+.barre-devis{background:transparent;color:var(--blanc);text-decoration:none;font-weight:800;border-radius:var(--rayon);padding:.7rem 1rem;
+  box-shadow:inset 0 0 0 2px rgba(255,255,255,.5);display:flex;align-items:center}
+@media (min-width:900px){.barre-appel{display:none}}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+html{scroll-behavior:smooth}
+
+/* Photos */
+.photo{margin:1.75rem 0;}
+.photo img{display:block;width:100%;height:auto;aspect-ratio:3/2;object-fit:cover;border-radius:var(--rayon);background:var(--ligne)}
+.photo-petite{max-width:26rem}
+.accueil-photo{max-width:76rem;margin:0 auto;padding:0 1.25rem}
+.photo-large{margin:.5rem 0 1rem}
+@media (min-width:1000px){.photo-large img{aspect-ratio:21/9}}
+
+/* Pages légales */
+.texte-legal h2{margin-top:2rem;font-size:1.15rem}
+.texte-legal ul{padding-left:1.2rem;max-width:68ch}
+.form-legal{font-size:.85rem;margin:1rem 0 0}

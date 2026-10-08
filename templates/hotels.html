@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% from "_macros.html" import appel, formulaire, liste_trajets, photo as ph %}
+{% block devis_link %}#devis{% endblock %}
+{% block main %}
+<div class="mise-en-page">
+<article class="principal">
+  <h1>Chauffeur privé pour les hôtels de {{ ville }}</h1>
+  <p class="chapo">Prise en charge à la réception de votre hôtel ou dépose à la porte, pour rejoindre un aéroport, une gare ou une autre ville. Le chauffeur aide au chargement des bagages.</p>
+  <div class="actions">
+    <a class="bouton-appel" href="tel:{{ cfg.telephone_lien }}" data-emplacement="hotels-haut">Appeler le standard 24h/24</a>
+    <a class="bouton-second" href="#devis">Demander un devis</a>
+  </div>
+  {{ ph(photo) }}
+  <section class="bloc">
+    <h2>Hôtels desservis à {{ ville }}</h2>
+    <ul class="liste-hotels">
+      {% for h in hotels %}<li><span class="h-nom">{{ h.nom }}</span><span class="h-info">{{ h.categorie }}, {{ h.zone }}</span></li>{% endfor %}
+    </ul>
+    <p>Votre hôtel n'est pas dans la liste ? Nous assurons la prise en charge dans tous les hôtels de {{ ville }} et des environs.</p>
+  </section>
+  {% if infra %}
+  <section class="bloc">
+    <h2>Aéroports et gares de {{ ville }}</h2>
+    <ul class="liste-simple">{% for x in infra %}<li><a href="{{ x.url }}">{{ x.titre }}</a></li>{% endfor %}</ul>
+  </section>
+  {% endif %}
+  {% if arrivees %}
+  <section class="bloc">
+    <h2>Rejoindre {{ ville }} en chauffeur privé</h2>
+    {{ liste_trajets(arrivees, 'dep') }}
+  </section>
+  {% endif %}
+  {{ appel(cfg, "hotels-milieu") }}
+</article>
+<aside class="cote">{{ formulaire("", ville) }}</aside>
+</div>
+{% endblock %}
