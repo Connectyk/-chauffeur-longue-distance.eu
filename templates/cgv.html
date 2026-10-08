@@ -2,33 +2,38 @@
 {% set e = cfg.entreprise %}
 {% block main %}
 <div class="etroit texte-legal">
-  <h1>Conditions générales de vente</h1>
+  <h1>Conditions générales</h1>
   <p>En vigueur au {{ date_maj }}.</p>
 
-  <h2>1. Objet</h2>
-  <p>Les présentes conditions générales de vente (CGV) régissent les prestations de transport de personnes avec chauffeur réservées auprès de {{ cfg.nom_marque }}, service exploité par {{ e.raison_sociale }} ({{ e.forme }}, SIRET {{ e.siret }}, {{ e.adresse }}), ci-après « le Prestataire ». Toute réservation implique l'acceptation sans réserve des présentes CGV.</p>
+  <h2>1. Qui fait quoi</h2>
+  <p>{{ cfg.nom_marque }} est un service exploité par {{ e.raison_sociale }} ({{ e.forme }}, SIRET {{ e.siret }}, {{ e.adresse }}), ci-après « l'Intermédiaire ». L'Intermédiaire organise les demandes de trajet et met en relation ses clients avec des chauffeurs VTC professionnels indépendants, ci-après « le Chauffeur partenaire ».</p>
+  <p>L'Intermédiaire n'est pas transporteur. Le contrat de transport est conclu directement entre le client et le Chauffeur partenaire, qui réalise la prestation, en fixe le prix dans son devis, l'encaisse et en remet la facture.</p>
+  <p>Les présentes conditions générales encadrent le service de mise en relation. Toute demande de devis implique leur acceptation.</p>
 
-  <h2>2. Nature du service</h2>
-  <p>Le Prestataire organise des trajets en voiture avec chauffeur : transferts aéroport et gare, trajets longue distance, mise à disposition, rapatriement et transport pour événements, en France, en Suisse et en Belgique. Les trajets sont réalisés par des chauffeurs professionnels partenaires du Prestataire, habilités au transport de personnes et couverts par une assurance adaptée. Le Prestataire reste l'interlocuteur unique du client pour la réservation, le prix et le suivi de la prestation.</p>
+  <h2>2. Information sur la rémunération de l'Intermédiaire</h2>
+  <p>Le service de mise en relation est gratuit pour le client. L'Intermédiaire est rémunéré par le Chauffeur partenaire, sous forme de commission sur les prestations réalisées. Les chauffeurs proposés sont choisis selon leur disponibilité, leur proximité du lieu de prise en charge et leur capacité à répondre à la demande (véhicule, options, horaires), et non selon le montant de la commission.</p>
 
-  <h2>3. Réservation</h2>
-  <p>La réservation se fait par téléphone auprès du standard ou par le formulaire de demande de devis du site. Le client communique le lieu et l'heure de prise en charge, la destination, le nombre de passagers et de bagages, et toute information utile (numéro de vol ou de train, siège enfant, besoins particuliers).</p>
-  <p>Le Prestataire adresse un devis précisant le prix, le type de véhicule et les conditions de la prestation. La réservation est ferme à l'acceptation du devis par le client (par écrit, email ou message) puis à sa confirmation par le Prestataire.</p>
+  <h2>3. Chauffeurs partenaires</h2>
+  <p>Les Chauffeurs partenaires sont des exploitants de voiture de transport avec chauffeur (VTC) ou des entreprises de transport de personnes, inscrits au registre prévu par la réglementation, titulaires de la carte professionnelle et d'une assurance couvrant le transport de passagers. L'Intermédiaire vérifie ces documents avant de proposer un chauffeur et à leur renouvellement. Pour un trajet en Suisse ou en Belgique, le chauffeur respecte la réglementation applicable dans le pays concerné.</p>
 
-  <h2>4. Prix</h2>
-  <p>Les prix sont établis sur devis, en euros, toutes taxes comprises. Le prix indiqué au devis est ferme pour le trajet décrit. Il comprend le véhicule, le chauffeur, le carburant et les péages, sauf mention contraire au devis.</p>
-  <p>Peuvent donner lieu à un supplément, s'ils n'étaient pas prévus au devis : un changement d'itinéraire ou un arrêt supplémentaire demandé par le client, une attente au-delà du temps inclus au devis, des frais de stationnement engagés à la demande du client, un nettoyage exceptionnel du véhicule.</p>
+  <h2>4. Demande et devis</h2>
+  <p>La demande se fait par téléphone auprès du standard ou par le formulaire du site. Le client indique le lieu et l'heure de prise en charge, la destination, le nombre de passagers et de bagages, et toute demande particulière (numéro de vol ou de train, pancarte, siège enfant, véhicule souhaité, arrêt en route…).</p>
+  <p>Le client reçoit un devis du Chauffeur partenaire, transmis directement ou par l'Intermédiaire. Le devis indique l'identité du chauffeur ou de son entreprise, le prix total, le véhicule, les options retenues et les conditions de paiement et d'annulation. La réservation est ferme à l'acceptation du devis par le client puis à sa confirmation par le chauffeur.</p>
 
-  <h2>5. Paiement</h2>
-  <p>Les modalités de paiement (acompte, paiement avant ou après la prestation, moyens acceptés) sont précisées sur le devis. Une facture est remise pour chaque prestation. Pour les clients professionnels, tout retard de paiement entraîne les pénalités prévues par la loi et une indemnité forfaitaire de 40 € pour frais de recouvrement.</p>
+  <h2>5. Prix et paiement</h2>
+  <p>Conformément à la réglementation VTC, le prix est fixé avant la prestation. Il est indiqué en euros (ou dans la devise précisée au devis), toutes taxes comprises, et comprend sauf mention contraire le véhicule, le chauffeur, le carburant et les péages.</p>
+  <p>Peuvent donner lieu à un supplément, s'ils n'étaient pas prévus au devis : un changement d'itinéraire ou un arrêt demandé en cours de route, une attente au-delà du temps inclus, des frais de stationnement engagés à la demande du client, un nettoyage exceptionnel du véhicule.</p>
+  <p>Le paiement est dû au Chauffeur partenaire selon les modalités de son devis. Il remet une facture pour chaque prestation.</p>
 
-  <h2>6. Attente et retards</h2>
-  <p>Pour une prise en charge à un aéroport, le chauffeur suit l'heure d'arrivée réelle du vol communiqué à la réservation. Le temps d'attente inclus, compté à partir de l'arrivée du vol ou de l'heure convenue, est indiqué sur le devis. Au-delà, l'attente peut être facturée selon le tarif indiqué au devis.</p>
-  <p>Le Prestataire met tout en œuvre pour respecter les horaires. Il ne peut être tenu responsable des retards dus au trafic, aux conditions météorologiques, à des travaux ou à tout événement extérieur.</p>
+  <h2>6. Options et demandes particulières</h2>
+  <p>Accueil avec pancarte, suivi du vol ou du train, siège enfant, relais de chauffeurs, véhicule précis, animal, matériel ou bagages hors format : toute demande est étudiée. Une option n'est due que si elle figure sur le devis accepté.</p>
 
-  <h2>7. Modification et annulation par le client</h2>
-  <p>Toute modification ou annulation doit être signalée au standard par téléphone ou par écrit.</p>
-  <p>Sauf conditions différentes indiquées sur le devis :</p>
+  <h2>7. Attente et retards</h2>
+  <p>Lorsque le client communique son numéro de vol ou de train, l'heure de prise en charge peut suivre l'arrivée réelle. Le temps d'attente inclus est indiqué sur le devis ; au-delà, l'attente peut être facturée selon le tarif du devis.</p>
+  <p>Les horaires sont respectés au mieux. Les retards dus au trafic, aux conditions météorologiques, à des travaux ou à tout événement extérieur ne peuvent être reprochés ni au chauffeur ni à l'Intermédiaire.</p>
+
+  <h2>8. Modification et annulation par le client</h2>
+  <p>Toute modification ou annulation est signalée au standard par téléphone ou par écrit. Les conditions d'annulation sont celles du devis du Chauffeur partenaire. À défaut de précision sur le devis :</p>
   <ul>
     <li>annulation plus de 24 heures avant la prise en charge : sans frais, l'acompte éventuel est remboursé ;</li>
     <li>annulation moins de 24 heures avant la prise en charge : 50 % du prix est dû ;</li>
@@ -36,29 +41,29 @@
   </ul>
   <p>En cas de vol ou de train annulé, le client prévient le standard dès qu'il en a connaissance : la réservation est alors modifiée ou annulée sans frais si le chauffeur n'est pas encore parti.</p>
 
-  <h2>8. Annulation par le Prestataire</h2>
-  <p>Si le Prestataire ne peut assurer une prestation confirmée, il en informe le client au plus tôt et propose un chauffeur de remplacement. À défaut, les sommes versées sont intégralement remboursées.</p>
+  <h2>9. Empêchement du chauffeur</h2>
+  <p>Si le Chauffeur partenaire ne peut pas assurer une prestation confirmée, l'Intermédiaire recherche un autre chauffeur aux mêmes conditions. À défaut, les sommes versées sont intégralement remboursées par le chauffeur.</p>
 
-  <h2>9. Obligations des passagers</h2>
+  <h2>10. Obligations des passagers</h2>
   <p>Le port de la ceinture de sécurité est obligatoire pour tous les passagers. Les enfants voyagent dans un siège adapté à leur âge et à leur taille, à demander lors de la réservation. Il est interdit de fumer et de vapoter dans le véhicule. Le chauffeur peut refuser ou interrompre une prestation en cas de comportement mettant en danger la sécurité, ou de dégradation du véhicule ; les frais de remise en état sont alors à la charge du client.</p>
-  <p>Les animaux sont acceptés uniquement s'ils ont été signalés à la réservation et acceptés par le Prestataire.</p>
 
-  <h2>10. Bagages et objets oubliés</h2>
-  <p>Le nombre et le volume des bagages sont indiqués à la réservation. Le Prestataire peut refuser des bagages non déclarés si le véhicule ne permet pas de les transporter en sécurité. Les objets oubliés dans le véhicule sont conservés et restitués sur demande, les frais d'envoi éventuels restant à la charge du client.</p>
+  <h2>11. Bagages et objets oubliés</h2>
+  <p>Le nombre et le volume des bagages sont indiqués à la demande. Des bagages non déclarés peuvent être refusés si le véhicule ne permet pas de les transporter en sécurité. Les objets oubliés sont restitués sur demande, les frais d'envoi éventuels restant à la charge du client.</p>
 
-  <h2>11. Responsabilité</h2>
-  <p>Les passagers sont couverts par l'assurance de transport de personnes du chauffeur pendant la prestation. La responsabilité du Prestataire ne peut être engagée en cas de force majeure, ni pour les conséquences indirectes d'un retard (vol ou train manqué, rendez-vous perdu), sauf faute prouvée de sa part.</p>
+  <h2>12. Responsabilités</h2>
+  <p>Le Chauffeur partenaire est seul responsable de l'exécution du transport. Les passagers sont couverts par son assurance de transport de personnes pendant la prestation.</p>
+  <p>L'Intermédiaire est responsable de son service de mise en relation : transmission fidèle de la demande, vérification des documents du chauffeur, suivi de la réservation. Sa responsabilité ne peut être engagée ni en cas de force majeure, ni pour les conséquences indirectes d'un retard (vol ou train manqué, rendez-vous perdu), sauf faute prouvée de sa part.</p>
 
-  <h2>12. Absence de droit de rétractation</h2>
-  <p>Conformément à l'article L221-28 du Code de la consommation, le droit de rétractation ne s'applique pas aux prestations de transport de personnes fournies à une date ou à une période déterminée. Les conditions d'annulation de l'article 7 s'appliquent.</p>
+  <h2>13. Droit de rétractation</h2>
+  <p>Conformément à l'article L221-28 du Code de la consommation, le droit de rétractation ne s'applique pas aux prestations de transport de personnes fournies à une date ou à une période déterminée. Les conditions d'annulation de l'article 8 s'appliquent.</p>
 
-  <h2>13. Réclamations et médiation</h2>
-  <p>Toute réclamation est à adresser par email à <a href="mailto:{{ cfg.email }}">{{ cfg.email }}</a>. Si aucune solution amiable n'est trouvée, le client consommateur peut recourir gratuitement au médiateur de la consommation : {{ e.mediateur }}.</p>
+  <h2>14. Réclamations et médiation</h2>
+  <p>Toute réclamation est à adresser par email à <a href="mailto:{{ cfg.email }}">{{ cfg.email }}</a> : l'Intermédiaire la traite ou la transmet au Chauffeur partenaire concerné. Si aucune solution amiable n'est trouvée, le client consommateur peut recourir gratuitement au médiateur de la consommation : {{ e.mediateur }} pour le service de mise en relation, ou le médiateur indiqué par le chauffeur pour la prestation de transport.</p>
 
-  <h2>14. Données personnelles</h2>
-  <p>Les données transmises lors de la réservation sont utilisées pour organiser la prestation. Voir la <a href="{{ u('/confidentialite/') }}">politique de confidentialité</a>.</p>
+  <h2>15. Données personnelles</h2>
+  <p>Voir la <a href="{{ u('/confidentialite/') }}">politique de confidentialité</a>.</p>
 
-  <h2>15. Droit applicable</h2>
-  <p>Les présentes CGV sont soumises au droit français. En cas de litige avec un client professionnel, compétence est attribuée aux tribunaux du ressort du siège du Prestataire. Le client consommateur peut saisir la juridiction de son choix dans les conditions prévues par la loi.</p>
+  <h2>16. Droit applicable</h2>
+  <p>Les présentes conditions sont soumises au droit français. En cas de litige avec un client professionnel, compétence est attribuée aux tribunaux du ressort du siège de l'Intermédiaire. Le client consommateur peut saisir la juridiction de son choix dans les conditions prévues par la loi.</p>
 </div>
 {% endblock %}

@@ -22,6 +22,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Identité du robot de publication
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
       - name: Décompresser le zip envoyé
         run: |
           zip=$(ls *.zip 2>/dev/null | head -n 1)
@@ -29,10 +34,9 @@ jobs:
             unzip -q -o "$zip" -d /tmp/site
             src=$(dirname "$(find /tmp/site -maxdepth 3 -name config.json | head -n 1)")
             rm -rf "$src/.github"
-            cp -a "$src"/. ./
-            git rm -q "$zip"
-            git config user.name "github-actions[bot]"
-            git config user.email "github-actions[bot]@users.noreply.github.com"
+            # Le contenu du zip remplace le site : un fichier retiré du zip disparaît aussi du dépôt.
+            # Les itinéraires déjà calculés (data/itineraires.json) sont conservés.
+            rsync -a --delete --exclude .git --exclude .github --exclude data/itineraires.json "$src"/ ./
             git add -A
             git commit -q -m "Décompression de $zip"
             git push
@@ -56,7 +60,18 @@ jobs:
         run: pip install -r requirements.txt
 
       - if: steps.verif.outputs.pret == 'oui'
+        env:
+          ITINERAIRES: "1"
         run: python generator/build.py
+
+      - name: Garder les nouveaux itinéraires calculés
+        if: steps.verif.outputs.pret == 'oui'
+        run: |
+          if [ -f data/itineraires.json ] && [ -n "$(git status --porcelain data/itineraires.json)" ]; then
+            git add data/itineraires.json
+            git commit -q -m "Itinéraires routiers mis à jour"
+            git pull -q --rebase && git push || echo "Itinéraires non enregistrés cette fois, ils seront recalculés."
+          fi
 
       - if: steps.verif.outputs.pret == 'oui'
         uses: actions/upload-pages-artifact@v3

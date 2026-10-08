@@ -38,8 +38,8 @@
     "devis": ["main-poignee"]
   },
   "lieux": {
-    "Bordeaux Saint-Jean": "gare-bordeaux-saint-jean",
-    "Lyon Saint-Exupéry TGV": "gare-lyon-saint-exupery",
+    "Gare Bordeaux Saint-Jean": "gare-bordeaux-saint-jean",
+    "Gare Lyon Saint-Exupéry TGV": "gare-lyon-saint-exupery",
     "Lyon-Saint-Exupéry": "gare-lyon-saint-exupery",
     "Paris": "quartier-affaires-soir"
   },

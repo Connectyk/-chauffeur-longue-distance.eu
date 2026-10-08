@@ -67,6 +67,8 @@ class Photos:
         z = self.zone(t.dest.cle) or self.zone(t.dep.cle)
         if z:
             return self.groupe(z, g)
+        if t.dest.categorie == "Quartier" or (t.dep.categorie == "Quartier" and t.dest.categorie == "Ville"):
+            return self.groupe("affaires", g)
         if t.segment == "Très longue distance":
             return self.groupe("nuit", g)
         if "Aéroport" in (t.dep.categorie, t.dest.categorie):

@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% from "_macros.html" import formulaire, photo as ph %}
+{% from "_macros.html" import formulaire, photo as ph with context %}
 {% block main %}
 <section class="accueil-hero">
   <div class="hero-texte">
@@ -32,7 +32,8 @@
     <h2>Comment ça se passe</h2>
     <ol class="etapes">
       <li><strong>Vous appelez ou envoyez une demande.</strong> Départ, destination, date, passagers et bagages.</li>
-      <li><strong>Le standard vous confirme un chauffeur</strong> avec un devis personnalisé, sans paiement en ligne.</li>
+      <li><strong>Nous trouvons le chauffeur partenaire</strong> disponible le plus proche, qui vous adresse son devis, sans paiement en ligne.</li>
+      <li><strong>Vos demandes particulières sont étudiées</strong> : pancarte, siège enfant, véhicule précis, arrêt en route, horaire inhabituel.</li>
       <li><strong>Le chauffeur vous prend en charge</strong> à l'heure et à l'adresse convenues.</li>
     </ol>
   </section>

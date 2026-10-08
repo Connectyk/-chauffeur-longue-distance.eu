@@ -11,6 +11,8 @@
 <meta property="og:url" content="{{ canonical }}">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="fr_FR">
+<meta property="og:site_name" content="{{ cfg.nom_marque }}">
+<meta name="twitter:card" content="summary_large_image">
 {% if photo %}<meta property="og:image" content="{{ base_url }}{{ photo.jpg }}">{% endif %}
 <meta name="theme-color" content="#13233A">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -19,10 +21,6 @@
 <link rel="stylesheet" href="{{ u('/static/style.css') }}">
 {% for s in schemas %}<script type="application/ld+json">{{ s|tojson }}</script>
 {% endfor %}
-{% if cfg.ga4_id %}
-<script async src="https://www.googletagmanager.com/gtag/js?id={{ cfg.ga4_id }}"></script>
-<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','{{ cfg.ga4_id }}');</script>
-{% endif %}
 </head>
 <body data-type="{{ page_type }}" data-trajet="{% block trajet_id %}{% endblock %}">
 <a class="skip" href="#contenu">Aller au contenu</a>
@@ -61,6 +59,7 @@
       <p>Chauffeur privé longue distance en France, en Suisse et en Belgique. Standard joignable jour et nuit.</p>
       <p><a class="tel-pied" href="tel:{{ cfg.telephone_lien }}" data-emplacement="pied">{{ cfg.telephone_affiche }}</a></p>
       <p><a href="mailto:{{ cfg.email }}">{{ cfg.email }}</a></p>
+      <p class="pied-info">Service de mise en relation : les trajets sont réalisés et facturés par des chauffeurs VTC professionnels partenaires.</p>
     </div>
     <ul class="pied-liens">
       <li><a href="{{ u('/services/') }}">Nos services</a></li>
@@ -75,8 +74,9 @@
       <li><a href="{{ u('/devis/') }}">Demander un devis</a></li>
       <li><a href="{{ u('/contact/') }}">Contact</a></li>
       <li><a href="{{ u('/mentions-legales/') }}">Mentions légales</a></li>
-      <li><a href="{{ u('/conditions-generales/') }}">Conditions générales de vente</a></li>
+      <li><a href="{{ u('/conditions-generales/') }}">Conditions générales</a></li>
       <li><a href="{{ u('/confidentialite/') }}">Confidentialité</a></li>
+      {% if cfg.ga4_id %}<li><button type="button" class="lien-cookies" data-cookies="ouvrir">Gérer les cookies</button></li>{% endif %}
     </ul>
   </div>
 </footer>
@@ -85,7 +85,16 @@
   <a class="barre-tel" href="tel:{{ cfg.telephone_lien }}" data-emplacement="barre-mobile">Appeler maintenant <small>Standard 24h/24</small></a>
   <a class="barre-devis" href="{% block devis_link %}{{ u('/devis/') }}{% endblock %}">Devis</a>
 </div>
-<script>window.SITE={endpoint:{{ cfg.formulaire_endpoint|tojson }},tel:{{ cfg.telephone_affiche|tojson }}};</script>
+{% if cfg.ga4_id %}
+<div class="cookies" role="dialog" aria-label="Cookies" hidden>
+  <p>Nous utilisons des cookies de mesure d'audience (Google Analytics) pour savoir quelles pages vous sont utiles. Rien n'est déposé sans votre accord. <a href="{{ u('/confidentialite/') }}">En savoir plus</a></p>
+  <div class="cookies-choix">
+    <button type="button" class="bouton-second" data-cookies="refuser">Refuser</button>
+    <button type="button" class="bouton-second" data-cookies="accepter">Accepter</button>
+  </div>
+</div>
+{% endif %}
+<script>window.SITE={endpoint:{{ cfg.formulaire_endpoint|tojson }},tel:{{ cfg.telephone_affiche|tojson }},ga4:{{ (cfg.ga4_id or "")|tojson }}};</script>
 <script src="{{ u('/static/app.js') }}" defer></script>
 </body>
 </html>

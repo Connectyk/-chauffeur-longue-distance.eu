@@ -13,7 +13,8 @@ Vous modifiez le fichier, vous l'envoyez sur GitHub : le site se reconstruit et 
    - `telephone_affiche` (ex. `+33 3 80 00 00 00`) et `telephone_lien` (même numéro sans espaces : `+33380000000`)
    - `domaine_cname` : votre domaine (ex. `www.votre-domaine.fr`) si vous en branchez un. Côté OVH, même principe que pour vos autres sites GitHub Pages.
    - `formulaire_endpoint` : l'adresse fournie par Formspree (voir plus bas)
-   - `ga4_id` : l'identifiant Google Analytics 4 (`G-XXXXXXX`)
+   - `ga4_id` : l'identifiant Google Analytics 4 (`G-XXXXXXX`). Un bandeau cookies s'affiche alors automatiquement : GA4 ne se charge qu'après « Accepter ».
+   - `entreprise` → `declaration_centrale` et `assurance_rc` : numéro de déclaration de centrale de réservation et assureur RC pro. Ils s'affichent dans les mentions légales dès qu'ils sont remplis.
 4. Envoyez les modifications : la publication démarre (onglet **Actions** pour suivre).
 
 ## Ajouter ou modifier des pages
@@ -32,11 +33,43 @@ Tout se fait dans `data/master_seo.xlsx`, puis on remplace le fichier sur GitHub
 
 Le générateur recalcule lui-même distances, scores et phases avec les paramètres de 00_Parametres : pas besoin que le fichier soit recalculé par Excel.
 
+## Important : toujours partir de la dernière version
+
+Le zip envoyé **remplace** tout le site (un fichier absent du zip est supprimé du dépôt).
+Avant de modifier quoi que ce soit, téléchargez la version actuelle du dépôt (bouton **Code → Download ZIP** sur GitHub), sinon vous écraserez les dernières améliorations.
+Seul `data/itineraires.json` (les distances routières déjà calculées) est toujours conservé.
+
+## Pages croisées : gares et quartiers d'affaires
+
+En plus des trajets de la matrice, le générateur crée automatiquement (réglages `croisements` dans `config.json`) :
+
+| Réglage | Effet |
+|---|---|
+| `quartier_aeroports` / `rayon_aeroports_km` | Aéroports proches ↔ chaque quartier d'affaires (ex. CDG → La Défense) |
+| `quartier_gares` | Grandes gares de la ville ↔ quartier (ex. Gare de Lyon → La Défense) |
+| `quartier_villes` | Villes qui ont un trajet publié vers la ville du quartier ↔ quartier (ex. Lyon → La Défense) |
+| `gares_par_ville` / `gare_destinations` | Grandes gares ↔ destinations publiées de leur ville et aéroports proches (ex. Gare Part-Dieu → Genève) |
+| `actif` | `false` pour tout désactiver |
+
+Un trajet déjà présent dans la matrice n'est jamais dupliqué. Les coordonnées des quartiers sont dans `data/quartiers.json`
+(ou dans des colonnes `Latitude` / `Longitude` ajoutées à l'onglet 04, prioritaires).
+Pour ajouter un quartier : une ligne dans l'onglet 04, puis ses coordonnées et formulations dans `data/quartiers.json`.
+
+## Distances routières réelles
+
+À chaque publication sur GitHub, le générateur demande au calculateur d'itinéraires d'OpenStreetMap (OSRM) la vraie distance, la durée
+et les autoroutes empruntées (« A6, A46 puis A7 ») pour 400 trajets au plus, puis les garde dans `data/itineraires.json`.
+Il faut donc quelques publications pour couvrir tous les trajets (relancez la publication depuis l'onglet **Actions → Run workflow**).
+Une valeur saisie dans la colonne « Distance réelle (km) » ou « Axes routiers » de la matrice reste prioritaire.
+Pour désactiver : `config.json` → `itineraires` → `actif: false`. Le service OSRM public est gratuit mais limité : si les pages se multiplient,
+un service payant ou auto-hébergé peut le remplacer (champ `service`).
+
 ## Pages générées
 
 - `/chauffeur-prive/{depart}-{destination}/` pour les trajets ville → ville
 - `/chauffeur-prive/{depart}/{destination}/` pour les trajets avec aéroport ou gare
 - `/villes/…`, `/aeroports/…`, `/gares/…` : une page par lieu ayant au moins un trajet publié
+- `/chauffeur-prive/{depart}/{destination}/` aussi pour les croisements gares / quartiers d'affaires
 - `/quartiers-affaires/…` et `/hotels/{ville}/`
 - `/chauffeur-prive-urgence/`, `/chauffeur-prive-24h-24/`, `/devis/`, `/contact/`, `/mentions-legales/`
 - `sitemap.xml`, `robots.txt`, page 404
@@ -80,10 +113,16 @@ Deux événements sont envoyés à GA4 / Google Tag Manager :
 Dans GA4, marquez ces deux événements comme **événements clés**.
 Un clic n'est pas un appel abouti : pour mesurer les appels réels par page et par mot-clé, il faudra un service de numéros de suivi (call tracking) ou les extensions d'appel Google Ads.
 
+## Modèle juridique affiché sur le site
+
+Le site présente le service comme une **mise en relation** : les trajets sont réalisés, chiffrés et facturés par des chauffeurs VTC partenaires,
+et l'éditeur est rémunéré par commission (conditions générales, mentions légales, confidentialité, pied de page).
+Les options (pancarte, suivi de vol, relais de chauffeurs, siège enfant…) sont présentées « sur demande » et confirmées dans le devis du chauffeur.
+
 ## Avant la mise en ligne
 
-- Relire les textes de `generator/content.py` : ils contiennent des promesses de service (suivi du vol, pancarte, relais de chauffeurs). Gardez seulement ce que votre réseau assure vraiment.
-- Compléter `templates/mentions.html` (SIRET, hébergeur, confidentialité).
+- Faire valider le statut d'intermédiaire (déclaration de centrale de réservation, art. L3142-1 du Code des transports) et remplir `declaration_centrale` / `assurance_rc`.
+- Vérifier la carte VTC et l'assurance de chaque chauffeur partenaire (les conditions générales l'annoncent).
 - Remplir la colonne « Distance réelle » au moins pour les trajets les plus importants.
 - Déclarer le site dans Google Search Console et envoyer `sitemap.xml`.
 

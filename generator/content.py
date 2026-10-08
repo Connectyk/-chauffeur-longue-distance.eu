@@ -1,8 +1,8 @@
 """Textes des pages, construits à partir des données de chaque trajet / lieu.
 
-Toutes les promesses de service (suivi de vol, pancarte, relais, carte VTC…) sont
-regroupées ici : relisez-les et adaptez-les à ce que votre réseau assure
-réellement avant la mise en ligne.
+Les prestations sont réalisées par des chauffeurs VTC partenaires : le site les
+présente comme des options « sur demande » (pancarte, suivi de vol, relais de
+chauffeurs, siège enfant…), confirmées par le chauffeur dans son devis.
 """
 import zlib
 
@@ -21,12 +21,16 @@ def distance_txt(t):
 def ou_prise_en_charge(l):
     if l.categorie == "Ville":
         return f"à l'adresse de votre choix à {l.cle}"
+    if l.categorie == "Quartier":
+        return f"à l'adresse de votre bureau ou de votre hôtel ({l.titre})"
     return "à " + l.forme_vers
 
 
 def ou_depose(l):
     if l.categorie == "Ville":
         return f"l'adresse de votre choix à {l.cle}"
+    if l.categorie == "Quartier":
+        return f"l'adresse exacte de votre rendez-vous ({l.titre})"
     return l.forme_vers
 
 
@@ -38,6 +42,8 @@ def contexte(t, villes_affaires):
     villes = {t.dep.ville, t.dest.ville, t.dep.cle, t.dest.cle}
     if t.type == "Aéroport → Aéroport":
         return "aeroports"
+    if "Quartier" in (t.dep.categorie, t.dest.categorie):
+        return "affaires"
     if villes & (ALPES | RIVIERA) or "Premium" in (t.dep.bonus, t.dest.bonus):
         return "loisirs"
     if villes & villes_affaires:
@@ -57,13 +63,23 @@ def trajet(t, cfg, retour, villes_affaires=frozenset()):
     sections = []
 
     if d.categorie == "Aéroport":
-        p = ["Indiquez votre numéro de vol à la réservation : l'heure de prise en charge suit l'arrivée réelle de l'avion. "
-             "Le chauffeur vous attend dans le hall des arrivées avec une pancarte à votre nom, pour un accueil personnalisé."]
+        p = [choix(k + "ae", [
+            "Indiquez votre numéro de vol à la réservation : le chauffeur peut suivre l'arrivée réelle de l'avion et caler l'heure de prise en charge. "
+            "Accueil au point de rendez-vous convenu ou dans le hall des arrivées, avec une pancarte à votre nom sur demande.",
+            "Donnez votre numéro de vol en réservant : en cas de retard, la prise en charge est décalée avec l'arrivée de l'avion. "
+            "Sur demande, le chauffeur vous accueille dans le hall avec une pancarte à votre nom et vous aide avec les valises.",
+        ])]
         if "affaires" in d.type_detail.lower():
             p.append("Pour un vol en jet privé, précisez le terminal d'aviation d'affaires : la prise en charge s'organise directement avec l'assistance aéroportuaire.")
     elif d.categorie == "Gare":
         p = ["Donnez le numéro et l'heure d'arrivée de votre train. Le chauffeur vous attend à la sortie convenue lors de la réservation, "
-             "et l'horaire est ajusté en cas de retard de train."]
+             "et l'horaire est ajusté en cas de retard de train. Accueil sur le quai avec pancarte possible sur demande."]
+        if d.type_detail:
+            p.append(f"{d.titre} ({d.type_detail.lower()}) : une prise en charge à la descente du train permet de continuer sans attendre "
+                     f"une correspondance vers {a.forme_vers}.")
+    elif d.categorie == "Quartier":
+        p = [f"Prise en charge devant votre bureau, votre hôtel ou le centre de congrès {d.forme_de}, à l'heure de fin de votre réunion. "
+             "Si la réunion se prolonge, prévenez le standard : l'horaire est décalé."]
     else:
         p = [choix(k + "pc", [
             f"Prise en charge à votre domicile, à votre hôtel, à votre bureau ou sur un lieu de rendez-vous à {d.cle}.",
@@ -76,6 +92,9 @@ def trajet(t, cfg, retour, villes_affaires=frozenset()):
              "Le chauffeur vous dépose devant le bon terminal."]
     elif a.categorie == "Gare":
         p = ["Dépose au plus près de l'entrée de la gare, avec le temps nécessaire pour rejoindre votre train sans courir."]
+    elif a.categorie == "Quartier":
+        p = [f"Dépose au pied de l'immeuble de votre rendez-vous, {a.forme_vers} : siège social, tour de bureaux, hôtel ou centre de congrès. "
+             "Donnez l'heure à laquelle vous devez être en réunion : la prise en charge est calculée avec une marge pour la circulation."]
     else:
         p = [f"Dépose à l'adresse exacte que vous indiquez à {a.cle} : hôtel, entreprise, domicile ou lieu d'événement."]
     sections.append(("Dépose", p))
@@ -88,12 +107,17 @@ def trajet(t, cfg, retour, villes_affaires=frozenset()):
                  "le chauffeur part dès que vous êtes prêt.")
     if t.segment == "Très longue distance":
         p.append(f"Sur {distance_txt(t)}, le trajet se fait avec des pauses régulières. Pour un départ de nuit ou un horaire serré, "
-                 "demandez un relais de chauffeurs au moment de la réservation.")
+                 "un relais de chauffeurs peut être organisé sur demande.")
     elif t.segment == "Longue distance":
         p.append(choix(k + "ld", [
             "Un trajet direct, sans correspondance ni attente : vous travaillez, téléphonez ou vous reposez pendant la route.",
             "Pas de changement de train ni d'attente en gare : la route se fait d'une traite, à votre rythme.",
             "Plus simple qu'un trajet en train avec correspondance : vous montez une fois, vous descendez à destination.",
+        ]))
+    elif t.distance < 60:
+        p.append(choix(k + "ur", [
+            "Un transfert direct, sans changement de transport en commun ni attente de taxi, avec une marge prévue pour les heures de pointe.",
+            "Pas de RER, de métro ni de navette avec vos bagages : le chauffeur vous emmène directement, en tenant compte de la circulation.",
         ]))
     else:
         p.append("Un transfert rapide, utile quand un train ou une navette ne correspond pas à votre horaire.")
@@ -108,7 +132,7 @@ def trajet(t, cfg, retour, villes_affaires=frozenset()):
             choix(k + "af", [
                 f"Rendez-vous client, réunion, séminaire ou salon professionnel à {a.ville or a.cle} : vous arrivez à l'heure, reposé, et pouvez préparer votre rendez-vous d'affaires pendant le trajet.",
                 f"Pour un voyage d'affaires vers {a.ville or a.cle}, le chauffeur vous dépose devant le siège social, l'hôtel ou le centre de congrès, et peut vous attendre pour le retour.",
-                f"Dirigeants, cadres, collaborateurs ou délégations : chaque course vers {a.ville or a.cle} donne lieu à une facture, pratique pour la note de frais.",
+                f"Dirigeants, cadres, collaborateurs ou délégations : chaque course vers {a.ville or a.cle} donne lieu à une facture du chauffeur, pratique pour la note de frais.",
             ])]))
     elif ctx == "loisirs":
         sections.append(("Pour votre séjour", [
@@ -129,23 +153,38 @@ def trajet(t, cfg, retour, villes_affaires=frozenset()):
             "Précisez vos bagages et vos besoins (rehausseur, skis, matériel) au moment de réserver.",
         ])]))
 
+    sections.append(("Demandes particulières", [
+        choix(k + "dp", [
+            "Pancarte à votre nom, siège enfant ou rehausseur, véhicule précis, arrêt en route, animal, bagages hors format, attente sur place : "
+            "toute demande particulière est étudiée. Précisez-la à la réservation, le chauffeur partenaire la confirme dans son devis.",
+            "Un modèle de véhicule, une bouteille d'eau, un arrêt pour récupérer un collègue, un trajet retour le soir même, un horaire inhabituel : "
+            "dites-nous ce dont vous avez besoin, nous trouvons le chauffeur qui peut le faire.",
+            "Rien n'est figé : accueil avec pancarte, siège bébé, skis, matériel professionnel, animal de compagnie ou étape imprévue. "
+            "Indiquez vos demandes à la réservation, elles figurent ensuite sur le devis du chauffeur.",
+        ])]))
+
     sections.append(("Réservation 24h/24", [
         "Le standard répond jour et nuit, 7j/7, week-end et jours fériés compris. Pour un départ dans les prochaines heures, appelez directement : "
-        "c'est le moyen le plus rapide. Pour un trajet planifié, demandez un devis gratuit : le prix est connu à l'avance."]))
+        "c'est le moyen le plus rapide. Pour un trajet planifié, demandez un devis gratuit : le prix est fixé à l'avance par le chauffeur partenaire."]))
 
     faq = [
         (f"Combien de temps dure le trajet {d.titre} – {a.titre} en chauffeur privé ?",
-         f"Comptez {t.duree} environ pour {distance_txt(t)}, hors pauses et selon le trafic."),
+         f"Comptez {t.duree} pour {distance_txt(t)}, hors pauses et selon le trafic." if not t.distance_reelle
+         else f"Comptez {t.duree} environ pour {t.distance} km, hors pauses et selon le trafic."),
         ("Comment connaître le prix ?",
          "Chaque trajet fait l'objet d'un devis personnalisé et gratuit selon la date, l'horaire, le nombre de passagers et le véhicule. "
          "Appelez le standard ou envoyez une demande : vous recevez une réponse rapidement."),
     ]
     if d.categorie == "Aéroport":
         faq.append(("Que se passe-t-il si mon vol a du retard ou est annulé ?",
-                    "En cas de retard, le chauffeur se cale sur l'heure d'arrivée réelle de votre vol. En cas de vol annulé, appelez le standard pour adapter la réservation."))
+                    "Donnez votre numéro de vol : en cas de retard, la prise en charge suit l'heure d'arrivée réelle de l'avion. En cas de vol annulé, appelez le standard pour adapter la réservation."))
     if d.categorie == "Gare":
         faq.append(("Où le chauffeur m'attend-il ?",
                     "À la sortie convenue lors de la réservation. Son numéro vous est transmis avant votre arrivée."))
+    if a.categorie == "Quartier":
+        faq.append(("Combien de temps prévoir aux heures de pointe ?",
+                    f"L'estimation de {t.duree} correspond à une circulation normale. Aux heures de pointe, le standard prévoit une marge "
+                    "pour que vous soyez à l'heure à votre rendez-vous."))
     if t.transfrontalier:
         faq.append(("Le chauffeur peut-il passer la frontière ?",
                     "Oui. Les trajets entre la France, la Suisse et la Belgique sont assurés de porte à porte, sans changement de véhicule."))
@@ -153,7 +192,8 @@ def trajet(t, cfg, retour, villes_affaires=frozenset()):
         ("Peut-on réserver de nuit ou au dernier moment ?",
          f"Oui, le standard répond 24h/24. Pour un départ immédiat, appelez le {cfg['telephone_affiche']}."),
         ("Êtes-vous un service de VTC ?",
-         "Oui : nos chauffeurs sont des professionnels du transport de personnes, qui travaillent uniquement sur réservation, avec un prix fixé à l'avance."),
+         "Nous organisons votre trajet et vous mettons en relation avec un chauffeur VTC professionnel partenaire, dont nous vérifions la carte professionnelle. "
+         "Il travaille uniquement sur réservation, avec un prix fixé à l'avance dans son devis."),
         ("Le chauffeur peut-il m'attendre sur place ?",
          "Oui, avec une mise à disposition : le chauffeur reste avec vous le temps de votre rendez-vous ou de votre visite, puis vous raccompagne."),
     ]))
@@ -197,7 +237,7 @@ SERVICES = [
  dict(slug="chauffeur-vtc-longue-distance", nav="Chauffeur VTC longue distance",
   title="Chauffeur VTC longue distance | Voiture avec chauffeur 24h/24",
   h1="Chauffeur VTC pour vos longues distances",
-  meta="Chauffeur VTC et voiture avec chauffeur pour vos grands trajets en France, Suisse et Belgique : porte à porte, sans correspondance, devis gratuit, standard 24h/24.",
+  meta="Chauffeur VTC pour vos grands trajets en France, Suisse et Belgique : porte à porte, sans correspondance, devis gratuit, standard 24h/24.",
   intro="Vous préférez ne pas conduire sur un long trajet ? Un chauffeur VTC professionnel vous conduit de porte à porte, d'une ville à l'autre, sans changement ni attente. C'est la voiture de transport avec chauffeur pensée pour la longue distance : un trajet interurbain, régional, national ou transfrontalier, réservé en un appel.",
   sections=[
    ("Une voiture avec chauffeur plutôt qu'un billet de train", [
@@ -211,21 +251,21 @@ SERVICES = [
    ("Une alternative au taxi sur les grands trajets", [
      "Un taxi fonctionne surtout en ville. Pour un transfert interville de plusieurs centaines de kilomètres, la location de voiture avec chauffeur est plus adaptée : le prix est connu à l'avance grâce au devis, sans compteur qui tourne et sans surprise à l'arrivée."]),
    ("Le service de chauffeur", [
-     "Nos chauffeurs sont des conducteurs expérimentés du transport de personnes, ponctuels, discrets et courtois, en tenue correcte. La discrétion et la confidentialité vont de soi, que vous voyagiez pour un rendez-vous d'affaires ou pour un séjour privé.",
+     "Nos chauffeurs partenaires sont des conducteurs expérimentés du transport de personnes, ponctuels, discrets et courtois, en tenue correcte. La discrétion et la confidentialité vont de soi, que vous voyagiez pour un rendez-vous d'affaires ou pour un séjour privé.",
      "La réservation se fait par téléphone auprès de notre standard téléphonique, ou par le formulaire de devis : vous recevez un rappel rapide avec un devis personnalisé."]),
   ],
-  faq=[("Quelle est la différence entre un chauffeur VTC et un chauffeur privé ?", "C'est le même métier : VTC signifie voiture de transport avec chauffeur. Le chauffeur VTC exerce avec une carte professionnelle et travaille uniquement sur réservation, ce qui permet de fixer le prix à l'avance."),
+  faq=[("Quelle est la différence entre un chauffeur VTC et un chauffeur privé ?", "C'est le même métier : VTC signifie voiture de transport avec chauffeur. Le chauffeur VTC exerce avec une carte professionnelle et travaille uniquement sur réservation, ce qui permet de fixer le prix à l'avance. Nos chauffeurs partenaires sont des VTC professionnels."),
        ("Le devis est-il gratuit ?", "Oui, le devis est gratuit et sans engagement. Il précise le prix total du trajet et les modalités de paiement."),
        ("Pouvez-vous faire un trajet de plus de 1 000 km ?", "Oui. Sur les très longues distances, le trajet est organisé avec des pauses régulières, et un relais de chauffeurs peut être prévu sur demande.")]),
 
  dict(slug="navette-aeroport", nav="Navette aéroport privée",
   title="Navette aéroport privée | Transfert aéroport avec chauffeur",
   h1="Navette aéroport privée et transfert aéroport",
-  meta="Navette privée vers et depuis les aéroports : accueil personnalisé au hall des arrivées, suivi du numéro de vol, transfert direct vers votre hôtel ou votre ville. 24h/24.",
+  meta="Navette privée vers et depuis les aéroports : accueil au hall des arrivées, pancarte et suivi de vol sur demande, transfert direct vers votre hôtel. 24h/24.",
   intro="Plus confortable qu'une navette partagée, plus fiable qu'un taxi trouvé à la sortie du terminal : votre transfert aéroport en voiture avec chauffeur vous emmène directement à destination, à n'importe quelle heure.",
   sections=[
    ("Accueil personnalisé à l'arrivée", [
-     "Communiquez votre numéro de vol à la réservation. Le chauffeur suit l'heure d'arrivée réelle de l'avion, vous attend dans le hall des arrivées avec une pancarte à votre nom, puis prend en charge vos valises jusqu'au véhicule. En cas de retard de vol, l'horaire de prise en charge est décalé."]),
+     "Communiquez votre numéro de vol à la réservation : le chauffeur peut suivre l'heure d'arrivée réelle de l'avion et décaler la prise en charge en cas de retard de vol. Sur demande, il vous attend dans le hall des arrivées avec une pancarte à votre nom et prend en charge vos valises jusqu'au véhicule."]),
    ("Vers l'aéroport, sans stress", [
      "Pour un départ, le standard calcule l'heure à laquelle venir vous chercher selon votre vol, le temps d'enregistrement et la circulation. Le chauffeur vous dépose devant le bon terminal."]),
    ("Aviation d'affaires, jet privé et équipages", [
@@ -239,7 +279,7 @@ SERVICES = [
  dict(slug="transfert-gare", nav="Transfert gare et navette gare",
   title="Transfert gare TGV avec chauffeur | Navette gare privée",
   h1="Transfert gare et navette gare avec chauffeur",
-  meta="Chauffeur privé à la descente du TGV ou pour rejoindre votre train : navette gare privée, accueil sur le quai ou à la sortie, retard de train pris en compte. 24h/24.",
+  meta="Chauffeur privé à la descente du TGV ou pour rejoindre votre train : navette gare privée, accueil à la sortie, retard de train pris en compte. 24h/24.",
   intro="Le TGV vous amène vite d'une grande ville à l'autre, mais rarement jusqu'à la porte de votre hôtel, de votre client ou de votre chalet. Votre chauffeur prend le relais à la gare.",
   sections=[
    ("À l'arrivée du train", [
@@ -247,13 +287,13 @@ SERVICES = [
    ("Train supprimé, grève, dernière correspondance partie", [
      "En cas de grève ou de train supprimé, appelez le standard : un chauffeur peut vous emmener directement à destination par la route, depuis la gare où vous êtes bloqué."]),
   ],
-  faq=[("Pouvez-vous venir me chercher dans une petite gare ?", "Oui, dans toutes les gares de France, de Suisse romande et de Belgique, sur réservation."),
+  faq=[("Pouvez-vous venir me chercher dans une petite gare ?", "Oui, sur réservation : grande gare, gare TGV ou petite gare de campagne, en France, en Suisse et en Belgique."),
        ("Le chauffeur m'aide-t-il avec mes bagages ?", "Oui, il prend en charge les valises entre la gare et le véhicule.")]),
 
  dict(slug="voyage-affaires", nav="Voyages d'affaires",
   title="Chauffeur pour voyages d'affaires, séminaires et congrès",
   h1="Chauffeur privé pour vos voyages d'affaires",
-  meta="Chauffeur privé pour déplacements professionnels : rendez-vous client, séminaire, salon professionnel, congrès, convention. Ponctualité, discrétion, facture entreprise.",
+  meta="Chauffeur privé pour déplacements professionnels : rendez-vous client, séminaire, salon, congrès. Ponctualité, discrétion, facture pour chaque course.",
   intro="Un déplacement professionnel réussi commence par un trajet sans imprévu. Votre chauffeur vous conduit à l'heure à votre rendez-vous d'affaires, à votre séminaire ou au centre de congrès, et vous ramène quand vous le souhaitez.",
   sections=[
    ("Pour tous vos rendez-vous", [
@@ -261,7 +301,7 @@ SERVICES = [
    ("Salons, congrès et conventions", [
      "Pendant un salon professionnel, un congrès, une conférence ou une convention, nous organisons les transferts entre l'aéroport, la gare, votre hôtel et le lieu de l'événement, pour une personne ou pour une délégation complète."]),
    ("Pour les entreprises", [
-     "Dirigeant, cadre, collaborateur en mission ou client VIP à accueillir : un compte entreprise permet de centraliser les réservations. Chaque course fait l'objet d'une facture, à joindre à votre note de frais."]),
+     "Dirigeant, cadre, collaborateur en mission ou client VIP à accueillir : le standard centralise vos réservations, pour un collaborateur ou toute une équipe, et un compte entreprise peut être ouvert sur demande. Chaque course fait l'objet d'une facture du chauffeur, à joindre à votre note de frais."]),
   ],
   faq=[("Pouvez-vous transporter une délégation entière ?", "Oui, avec plusieurs berlines ou un van, selon le nombre de passagers et de bagages."),
        ("Le chauffeur peut-il m'attendre pendant ma réunion ?", "Oui, c'est le principe de la mise à disposition : le chauffeur reste disponible le temps de votre rendez-vous, puis vous raccompagne.")]),
@@ -269,7 +309,7 @@ SERVICES = [
  dict(slug="rapatriement", nav="Rapatriement par la route",
   title="Rapatriement en voiture avec chauffeur | Vol annulé, grève",
   h1="Rapatriement par la route avec chauffeur",
-  meta="Vol annulé, grève, train supprimé, correspondance manquée : rapatriement en voiture avec chauffeur jusqu'à chez vous, de jour comme de nuit. Appelez le standard 24h/24.",
+  meta="Vol annulé, grève, train supprimé, correspondance manquée : rapatriement en voiture avec chauffeur jusqu'à chez vous, de jour comme de nuit. Standard 24h/24.",
   intro="Quand l'avion ou le train ne part plus, la route reste ouverte. Nous organisons votre rapatriement en voiture avec chauffeur, depuis un aéroport, une gare ou un hôtel, jusqu'à votre domicile ou votre prochaine destination.",
   sections=[
    ("Les situations courantes", [
@@ -309,7 +349,7 @@ SERVICES = [
  dict(slug="chauffeur-tourisme", nav="Tourisme et loisirs",
   title="Chauffeur privé pour le tourisme et les loisirs",
   h1="Chauffeur privé pour vos séjours et visites",
-  meta="Chauffeur privé pour touristes et voyageurs : musées, monuments, châteaux, vignobles, stations de ski, Riviera. Excursions à la journée et transferts vers votre hôtel.",
+  meta="Chauffeur privé pour touristes : musées, châteaux, vignobles, stations de ski, Riviera. Excursions à la journée et transferts vers votre hôtel.",
   intro="Pour un séjour réussi, laissez le volant : votre chauffeur vous emmène de l'aéroport à votre hôtel, puis vers les musées, les monuments et les plus beaux paysages de la région.",
   sections=[
    ("Excursions et journées découverte", [
@@ -325,7 +365,7 @@ SERVICES = [
  dict(slug="van-avec-chauffeur", nav="Van et groupes",
   title="Van avec chauffeur pour groupes et familles | 7 places",
   h1="Van avec chauffeur pour groupes et familles",
-  meta="Van ou minivan 7 places avec chauffeur pour les familles, les groupes et les équipes : beaucoup de place pour les bagages, les skis et le matériel. Devis gratuit.",
+  meta="Van ou minivan 7 places avec chauffeur pour familles, groupes et équipes : de la place pour les bagages, les skis et le matériel. Devis gratuit.",
   intro="Famille avec enfants, groupe d'amis, équipe en déplacement : un van avec chauffeur permet de voyager tous ensemble, avec les bagages, sur n'importe quelle distance.",
   sections=[
    ("Le véhicule", [

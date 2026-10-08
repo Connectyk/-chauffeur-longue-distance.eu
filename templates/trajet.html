@@ -1,11 +1,11 @@
 {% extends "base.html" %}
-{% from "_macros.html" import appel, formulaire, liste_trajets, photo as ph %}
+{% from "_macros.html" import appel, formulaire, liste_trajets, photo as ph with context %}
 {% block trajet_id %}{{ t.dep.titre }} → {{ t.dest.titre }}{% endblock %}
 {% block devis_link %}#devis{% endblock %}
 {% block main %}
 <div class="mise-en-page">
 <article class="principal">
-  <h1>{{ title.replace(' | 24h/24','') }}</h1>
+  <h1>{{ h1 }}</h1>
   <div class="panneau">
     <p class="panneau-ligne">{{ t.dep.titre }}</p>
     <svg class="panneau-fleche" viewBox="0 0 48 24" aria-hidden="true"><path d="M2 12h38M30 3l12 9-12 9" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="square"/></svg>
@@ -35,6 +35,13 @@
     {% for q, a in c.faq %}<details class="faq"><summary>{{ q }}</summary><p>{{ a }}</p></details>{% endfor %}
   </section>
 
+  {% if variantes %}
+  <section class="bloc">
+    <h2>Variantes de ce trajet</h2>
+    <p>Même départ, même arrivée, autre point de prise en charge ou de dépose : gare, aéroport, quartier d'affaires ou centre-ville.</p>
+    {{ liste_trajets(variantes, '') }}
+  </section>
+  {% endif %}
   {% if autres_depuis %}
   <section class="bloc">
     <h2>Autres trajets au départ {{ t.dep.forme_de }}</h2>

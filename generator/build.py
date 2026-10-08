@@ -5,7 +5,7 @@ from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "generator"))
-import model, content, images  # noqa: E402
+import model, content, images, croisements, itineraires  # noqa: E402
 
 cfg = json.load(open(os.path.join(ROOT, "config.json"), encoding="utf-8"))
 OUT = os.path.join(ROOT, cfg["dossier_sortie"])
@@ -74,6 +74,12 @@ def render(tpl, url, prio="0.6", **kw):
 lieux = data["lieux"]
 trajets = data["trajets"]
 pub = [t for t in trajets if t.publie]
+quartiers_l, sans_coord = croisements.quartiers_comme_lieux(ROOT, data["quartiers"])
+if sans_coord:
+    print("ATTENTION : quartiers sans coordonnées (data/quartiers.json) :", ", ".join(sans_coord))
+nb_matrice = len(pub)
+pub += croisements.generer(lieux, quartiers_l, pub, data["params"], cfg)
+itineraires.appliquer(ROOT, cfg, pub)
 for t in pub:
     if t.dep.categorie == "Ville" and t.dest.categorie == "Ville":
         t.url = u(f"/chauffeur-prive/{t.dep.slug}-{t.dest.slug}/")
@@ -95,13 +101,14 @@ for l in lieux.values():
         l.url = u(f"/{rep}/{strip(strip(l.slug, 'aeroport-'), 'gare-')}/")
 
 villes_avec_page = {l.cle: l for l in lieux.values() if l.categorie == "Ville" and l.url}
+for q in data["quartiers"]:
+    if "lieu" in q and (q["ville"] in villes_avec_page or q["lieu"].trajets_depart or q["lieu"].trajets_arrivee):
+        q["url"] = q["lieu"].url = u(f"/quartiers-affaires/{q['slug']}/")
 hotels_par_ville = defaultdict(list)
 for h in data["hotels"]:
     hotels_par_ville[h["ville"]].append(h)
 hotel_url = {v: u(f"/hotels/{villes_avec_page[v].slug}/") for v in hotels_par_ville if v in villes_avec_page}
-quartiers = [q for q in data["quartiers"] if q["ville"] in villes_avec_page]
-for q in quartiers:
-    q["url"] = u(f"/quartiers-affaires/{q['slug']}/")
+quartiers = [q for q in data["quartiers"] if q.get("url")]
 quartiers_par_ville = defaultdict(list)
 for q in quartiers:
     quartiers_par_ville[q["ville"]].append(q)
@@ -121,7 +128,7 @@ def groupe(lst, attr):
     g = defaultdict(list)
     for t in sorted(lst, key=lambda t: (-t.score, t.distance)):
         g[getattr(t, attr).categorie].append(t)
-    ordre = [("Ville", "Villes"), ("Aéroport", "Aéroports"), ("Gare", "Gares")]
+    ordre = [("Ville", "Villes"), ("Aéroport", "Aéroports"), ("Gare", "Gares"), ("Quartier", "Quartiers d'affaires")]
     return [(lab, g[k]) for k, lab in ordre if g[k]]
 
 
@@ -152,25 +159,58 @@ EXEMPLES = {"navette-aeroport": lambda t: "Aéroport" in (t.dep.categorie, t.des
 
 
 # ---------------------------------------------------------------- Trajets
+def court(l):
+    """« Aéroport de Zurich » -> « Zurich (ZRH) » : plus court, sans confusion avec la ville."""
+    for pre in ("Aéroport de ", "Aéroport d'", "Aéroport "):
+        if l.titre.startswith(pre):
+            return l.titre[len(pre):] + (f" ({l.code})" if l.code else " Airport")
+    return l.titre
+
+
+TITRES_PRIS = set()
+
+
+def titre_trajet(t):
+    """Title de 60 caractères au plus quand c'est possible (au-delà, Google le coupe), jamais en double."""
+    base = f"Chauffeur privé {t.dep.titre} → {t.dest.titre}"
+    choix = [base + " | 24h/24", base, f"Chauffeur privé {court(t.dep)} → {court(t.dest)}", f"VTC {court(t.dep)} → {court(t.dest)}"]
+    x = next((c for c in choix if len(c) <= 60 and c not in TITRES_PRIS), base)
+    TITRES_PRIS.add(x)
+    return x
+
+
+def meta_trajet(t):
+    debut = f"Chauffeur privé {t.dep.forme_de} vers {t.dest.forme_vers} : {content.distance_txt(t)}, {t.duree} de route. "
+    for fin in ("Devis personnalisé, standard 24h/24 et 7j/7.", "Devis gratuit, standard 24h/24.", "Standard 24h/24."):
+        if len(debut + fin) <= 158:
+            return debut + fin
+    return debut.rstrip() if len(debut) <= 158 else f"Chauffeur privé {t.dep.titre} → {t.dest.titre} : {content.distance_txt(t)}, {t.duree}. Standard 24h/24."
+
+
+par_villes = defaultdict(list)  # variantes d'un même trajet (gare, aéroport, quartier de la même ville)
+for t in pub:
+    par_villes[(t.dep.ville or t.dep.cle, t.dest.ville or t.dest.cle)].append(t)
+
 for t in pub:
     retour = pair.get((t.dest.cle, t.dep.cle))
     c = content.trajet(t, cfg, retour, VILLES_AFFAIRES)
     svc_liens = [SVC[s] for s in content.services_lies(t, c['ctx'])]
-    title = f"Chauffeur privé {t.dep.titre} → {t.dest.titre}"
-    if len(title) + 9 <= 60:
-        title += " | 24h/24"
-    meta = (f"Chauffeur privé {t.dep.forme_de} vers {t.dest.forme_vers} : {content.distance_txt(t)}, {t.duree} de route. "
-            "Devis personnalisé, standard 24h/24 et 7j/7.")
+    h1 = f"Chauffeur privé {t.dep.titre} → {t.dest.titre}"
+    title = titre_trajet(t)
+    variantes = sorted([x for x in par_villes[(t.dep.ville or t.dep.cle, t.dest.ville or t.dest.cle)] if x is not t],
+                       key=lambda x: (x.dep.categorie, x.dest.categorie, x.dep.titre, x.dest.titre))[:12]
+    meta = meta_trajet(t)
     crumbs = [("Accueil", u("/")), ("Trajets", u("/chauffeur-prive/")), (f"{t.dep.titre} → {t.dest.titre}", t.url)]
     ville_dest = t.dest.ville
-    liens_infra = [l for l in (t.dep, t.dest) if l.url]
+    liens_infra = [l for l in (t.dep, t.dest) if l.url and l.categorie != "Quartier"]
     service = {"@type": "Service", "serviceType": "Chauffeur privé", "name": title, "description": meta,
                "provider": {"@id": ORG_ID},
                "areaServed": [{"@type": "Place", "name": t.dep.titre}, {"@type": "Place", "name": t.dest.titre}]}
-    render("trajet.html", t.url, "0.8", photo=PH.pour_trajet(t), van=VAN, svc_liens=svc_liens, t=t, c=c, title=title, meta=meta, retour=retour, crumbs=crumbs,
+    render("trajet.html", t.url, "0.8" if t.source != "Croisement" else "0.6", photo=PH.pour_trajet(t), van=VAN, svc_liens=svc_liens, t=t, c=c,
+           title=title, h1=h1, meta=meta, retour=retour, crumbs=crumbs, variantes=variantes,
            autres_depuis=top(t.dep.trajets_depart, 8, (t,)), autres_vers=top(t.dest.trajets_arrivee, 6, (t, retour)),
            liens_infra=liens_infra, hotels_url=hotel_url.get(ville_dest), ville_dest=ville_dest,
-           quartiers=quartiers_par_ville.get(ville_dest, []),
+           quartiers=[q for q in quartiers_par_ville.get(ville_dest, []) if q.get("lieu") is not t.dest],
            schemas=schemas(service, crumbs, c["faq"]), page_type="trajet")
 
 # ---------------------------------------------------------------- Lieux
@@ -194,13 +234,16 @@ for l in lieux.values():
 
 # ---------------------------------------------------------------- Quartiers d'affaires
 for q in quartiers:
-    v = villes_avec_page[q["ville"]]
+    v = villes_avec_page.get(q["ville"])
+    ql = q["lieu"]
     crumbs = [("Accueil", u("/")), ("Quartiers d'affaires", u("/quartiers-affaires/")), (q["nom"], q["url"])]
     render("quartier.html", q["url"], "0.6", photo=PH._preparer("quartier-affaires-soir") if ("Défense" in q["nom"] or q["ville"] == "Paris") else PH.groupe("affaires", q["nom"]), q=q, v=v, crumbs=crumbs,
-           title=f"Chauffeur privé {q['nom']} ({q['ville']})"[:70],
-           meta=f"Chauffeur privé pour vos rendez-vous, séminaires et conférences à {q['nom']}, {q['ville']}. "
-                "Transferts depuis les aéroports et les gares, standard 24h/24.",
-           arrivees=top(v.trajets_arrivee, 10), infra=infra_de_ville(q["ville"]), hotels_url=hotel_url.get(q["ville"]),
+           title=f"Chauffeur privé {ql.titre} | Aéroports, gares 24h/24" if len(ql.titre) <= 19 else f"Chauffeur privé {ql.titre}",
+           meta=(f"Chauffeur privé pour {ql.forme_vers} : rendez-vous, séminaires, conférences. "
+                 "Transferts depuis les aéroports et les gares, standard 24h/24.")[:160],
+           arrivees=top(v.trajets_arrivee, 10) if v else [], infra=infra_de_ville(q["ville"]), hotels_url=hotel_url.get(q["ville"]),
+           q_departs=groupe(ql.trajets_depart, "dest"), q_arrivees=groupe(ql.trajets_arrivee, "dep"),
+           autres_quartiers=[x for x in quartiers_par_ville.get(q["ville"], []) if x is not q],
            schemas=schemas(None, crumbs), page_type="quartier")
 
 # ---------------------------------------------------------------- Hôtels (une page par ville)
@@ -272,7 +315,7 @@ for t in top(vv, 40):
 panneau = panneau[:5]
 aeroports_cles = sorted([l for l in lieux.values() if l.categorie == "Aéroport" and l.url and l.bonus == "Hub"], key=lambda l: l.titre)
 villes_cles = sorted([l for l in villes_avec_page.values() if l.priorite == 1], key=lambda l: -len(l.trajets_depart))[:16]
-render("home.html", u("/"), "1.0", photo=PH.groupe("accueil"), van=VAN, title=f"{cfg['nom_marque']} | Chauffeur privé France, Suisse & Belgique 24h/24",
+render("home.html", u("/"), "1.0", photo=PH.groupe("accueil"), van=VAN, title="Chauffeur privé longue distance | France, Suisse, Belgique",
        meta="Chauffeur privé pour vos trajets longue distance, transferts aéroports et gares, déplacements professionnels. Standard 24h/24 et 7j/7, devis personnalisé.",
        panneau=panneau, services=list(SVC.values()), aeroports=aeroports_cles, villes=villes_cles, nb_trajets=len(pub),
        schemas=schemas({"@type": "WebSite", "name": cfg["nom_marque"], "url": BASE + "/"}), page_type="accueil")
@@ -285,7 +328,7 @@ for slug, tpl, title, meta in [
     ("/devis/", "devis.html", "Demander un devis chauffeur privé", "Demandez votre devis de chauffeur privé : départ, destination, date et passagers. Réponse rapide, standard 24h/24."),
     ("/contact/", "contact.html", "Contact | Standard chauffeur privé 24h/24", "Joignez notre standard 24h/24 par téléphone ou envoyez une demande de devis."),
     ("/mentions-legales/", "mentions.html", "Mentions légales", "Mentions légales du site."),
-    ("/conditions-generales/", "cgv.html", "Conditions générales de vente", "Conditions générales de vente des prestations de chauffeur privé."),
+    ("/conditions-generales/", "cgv.html", "Conditions générales", "Conditions générales du service de mise en relation avec des chauffeurs VTC partenaires."),
     ("/confidentialite/", "confidentialite.html", "Politique de confidentialité", "Politique de confidentialité et données personnelles."),
 ]:
     crumbs = [("Accueil", u("/")), (title.split(" |")[0], u(slug))]
@@ -314,7 +357,8 @@ open(os.path.join(OUT, ".nojekyll"), "w").write("")
 cnt = defaultdict(int)
 for t in pub:
     cnt[t.type] += 1
-print(f"{len(pages)} pages générées dans {cfg['dossier_sortie']}/ — {len(pub)} trajets publiés", dict(cnt))
+print(f"{len(pages)} pages générées dans {cfg['dossier_sortie']}/ — {len(pub)} trajets publiés "
+      f"({nb_matrice} de la matrice, {len(pub) - nb_matrice} croisements gares / quartiers)", dict(cnt))
 
 # ---------------------------------------------------------------- Contrôle du champ lexical
 import re as _re, html as _html

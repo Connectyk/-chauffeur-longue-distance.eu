@@ -15,6 +15,42 @@
     if (typeof window.gtag === "function") window.gtag("event", nom, p);
   }
 
+  // Consentement aux cookies : Google Analytics n'est chargé qu'après « Accepter » (choix gardé 6 mois)
+  var CLE = "consentement_cookies", SIX_MOIS = 182 * 24 * 3600 * 1000;
+  function lireChoix() {
+    try {
+      var c = JSON.parse(localStorage.getItem(CLE) || "null");
+      return c && Date.now() - c.date < SIX_MOIS ? c.choix : null;
+    } catch (e) { return null; }
+  }
+  function chargerGA() {
+    if (!SITE.ga4 || window.gtag) return;
+    window.dataLayer = window.dataLayer || [];
+    window.gtag = function () { window.dataLayer.push(arguments); };
+    window.gtag("js", new Date());
+    window.gtag("config", SITE.ga4);
+    var s = document.createElement("script");
+    s.async = true;
+    s.src = "https://www.googletagmanager.com/gtag/js?id=" + encodeURIComponent(SITE.ga4);
+    document.head.appendChild(s);
+  }
+  var bandeau = document.querySelector(".cookies");
+  if (SITE.ga4 && bandeau) {
+    var choix = lireChoix();
+    if (choix === "accepter") chargerGA();
+    else if (!choix) bandeau.hidden = false;
+    document.addEventListener("click", function (e) {
+      var b = e.target.closest && e.target.closest("[data-cookies]");
+      if (!b) return;
+      var action = b.dataset.cookies;
+      if (action === "ouvrir") { bandeau.hidden = false; return; }
+      try { localStorage.setItem(CLE, JSON.stringify({ choix: action, date: Date.now() })); } catch (err) {}
+      bandeau.hidden = true;
+      if (action === "accepter") chargerGA();
+      else if (window.gtag) location.reload();
+    });
+  }
+
   // Provenance : page d'entrée, référent, UTM, gclid (conservés pendant la visite)
   var prov = {};
   try {

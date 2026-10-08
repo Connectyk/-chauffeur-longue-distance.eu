@@ -20,6 +20,30 @@
     "responsable": "Valentin MARCHAL",
     "siret": "889 896 387 00020",
     "adresse": "4 rue de Fontaine-lès-Dijon, 21000 Dijon, France",
-    "mediateur": "CM2C (Centre de la Médiation de la Consommation de Conciliateurs de Justice), www.cm2c.net"
+    "mediateur": "CM2C (Centre de la Médiation de la Consommation de Conciliateurs de Justice), www.cm2c.net",
+    "declaration_centrale": "",
+    "assurance_rc": ""
+  },
+  "croisements": {
+    "actif": true,
+    "distance_min_km": 3,
+    "quartier_aeroports": 3,
+    "rayon_aeroports_km": 60,
+    "quartier_gares": 3,
+    "quartier_villes": 8,
+    "gares_par_ville": 3,
+    "gare_destinations": 8,
+    "types_gares": [
+      "Grande gare",
+      "Gare TGV",
+      "Gare TGV/aéroport"
+    ]
+  },
+  "itineraires": {
+    "actif": true,
+    "service": "https://router.project-osrm.org",
+    "max_par_publication": 400,
+    "pause_secondes": 1.1,
+    "marge_duree": 1.12
   }
 }

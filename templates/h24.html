@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% from "_macros.html" import appel, photo as ph %}
+{% from "_macros.html" import appel, photo as ph with context %}
 {% block main %}
 <div class="etroit">
   <h1>Chauffeur privé 24h/24 et de nuit</h1>
@@ -8,12 +8,12 @@
   {{ ph(photo) }}
   <section class="bloc">
     <h2>Transferts aéroport de nuit</h2>
-    <p>Premier vol du matin ou dernier vol du soir : réservez la veille, ou appelez au dernier moment. Le chauffeur suit l'heure d'arrivée réelle de votre vol.</p>
+    <p>Premier vol du matin ou dernier vol du soir : réservez la veille, ou appelez au dernier moment. Donnez votre numéro de vol : le chauffeur peut suivre l'heure d'arrivée réelle de l'avion.</p>
     <ul class="liste-colonnes">{% for l in aeroports %}<li><a href="{{ l.url }}">{{ l.titre }}</a></li>{% endfor %}</ul>
   </section>
   <section class="bloc">
     <h2>Longue distance de nuit</h2>
-    <p>Rentrer chez soi après un salon ou une réunion tardive, rejoindre une ville pour un rendez-vous tôt le lendemain : sur les très longs trajets, demandez un relais de chauffeurs.</p>
+    <p>Rentrer chez soi après un salon ou une réunion tardive, rejoindre une ville pour un rendez-vous tôt le lendemain : sur les très longs trajets, un relais de chauffeurs peut être organisé sur demande.</p>
     <p><a href="{{ u('/chauffeur-prive/') }}">Voir tous les trajets</a></p>
   </section>
   <section class="bloc">

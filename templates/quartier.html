@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% from "_macros.html" import appel, formulaire, liste_trajets, photo as ph %}
+{% from "_macros.html" import appel, formulaire, liste_trajets, photo as ph with context %}
 {% block devis_link %}#devis{% endblock %}
 {% block main %}
 <div class="mise-en-page">
@@ -17,6 +17,18 @@
     <p>Indiquez l'adresse de votre rendez-vous et l'heure à laquelle vous devez y être : le standard calcule l'heure de prise en charge avec une marge pour la circulation aux heures de pointe.</p>
     {% if infra %}<ul class="liste-simple">{% for x in infra %}<li><a href="{{ x.url }}">{{ x.titre }}</a></li>{% endfor %}</ul>{% endif %}
   </section>
+  {% for lab, ts in q_arrivees %}
+  <section class="bloc">
+    <h2>Vers {{ q.lieu.forme_vers }} depuis les {{ lab|lower }}</h2>
+    {{ liste_trajets(ts, 'dep') }}
+  </section>
+  {% endfor %}
+  {% for lab, ts in q_departs %}
+  <section class="bloc">
+    <h2>Au départ {{ q.lieu.forme_de }} : {{ lab|lower }}</h2>
+    {{ liste_trajets(ts, 'dest') }}
+  </section>
+  {% endfor %}
   {% if arrivees %}
   <section class="bloc">
     <h2>Trajets longue distance vers {{ q.ville }}</h2>
@@ -27,7 +39,8 @@
   <section class="bloc">
     <h2>À proximité</h2>
     <ul class="liste-simple">
-      <li><a href="{{ v.url }}">Chauffeur privé {{ v.titre }}</a></li>
+      {% if v %}<li><a href="{{ v.url }}">Chauffeur privé {{ v.titre }}</a></li>{% endif %}
+      {% for x in autres_quartiers %}<li><a href="{{ x.url }}">Quartier d'affaires : {{ x.nom }}</a></li>{% endfor %}
       {% if hotels_url %}<li><a href="{{ hotels_url }}">Hôtels de {{ q.ville }}</a></li>{% endif %}
     </ul>
   </section>

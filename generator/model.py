@@ -93,6 +93,44 @@ def haversine(a, b):
     return 6371 * 2 * math.asin(math.sqrt(h))
 
 
+def minutes_route(d, P):
+    """Durée de route estimée, arrondie au quart d'heure. En dessous de 60 km, la vitesse
+    moyenne urbaine (p_vit_urbaine, 45 km/h par défaut) reflète mieux la circulation."""
+    if d < (P.get("p_seuil_urbain") or 60):
+        vit = P.get("p_vit_urbaine") or 45
+    else:
+        vit = P["p_vit_lente"] if d < P["p_seuil_vitesse"] else P["p_vit_rapide"]
+    return int(round(d / vit * 60 / 15)) * 15 or 15
+
+
+def calculer(dep, dest, typ, P, reelle=None, intention="", mot_cle="", source="", axes="", forcer=""):
+    """Distance, durée, score, phase et segment d'un trajet (mêmes règles que la matrice Excel)."""
+    d = int(round(reelle)) if reelle else int(round(haversine(dep, dest) * P["p_facteur"]))
+    minutes = minutes_route(d, P)
+    if d < P["p_local"]:
+        score = 0
+    else:
+        R = max([l.rayon for l in (dep, dest) if l.categorie != "Ville"] or [0])
+        if typ == "Aéroport → Aéroport":
+            s = P["p_pts_plein"]
+        elif R:
+            s = P["p_pts_plein"] if d <= R else P["p_pts_moyen"] if d <= P["p_mult2"] * R else P["p_pts_r3"]
+        else:
+            s = P["p_pts_plein"] if d >= P["p_vv_min"] else P["p_pts_moyen"] if d >= P["p_vv_moy"] else P["p_pts_court"]
+        s += sum(P["p_prio1"] if l.priorite == 1 else P["p_prio2"] for l in (dep, dest))
+        s += P["p_tf"] if dep.pays != dest.pays else 0
+        s += P["p_hub"] * [dep.bonus, dest.bonus].count("Hub")
+        s += P["p_prem"] if "Premium" in (dep.bonus, dest.bonus) else 0
+        score = int(s)
+    if d < P["p_local"]:
+        phase = "Local → page infra"
+    else:
+        phase = "Phase 1" if score >= P["p_ph1"] else "Phase 2" if score >= P["p_ph2"] else "Phase 3"
+    segment = ("Local" if d < P["p_local"] else "Courte distance" if d < P["p_vv_min"]
+               else "Longue distance" if d < P["p_tres_long"] else "Très longue distance")
+    return Trajet(dep, dest, typ, intention, mot_cle, source, d, bool(reelle), minutes, score, phase, segment, axes, forcer)
+
+
 def lire_parametres(wb):
     p = {}
     for name, dn in wb.defined_names.items():
@@ -139,7 +177,8 @@ def charger(path, phases_publiees):
             l.type_detail = _txt(r.get("Type"))
 
     quartiers = [dict(ville=_txt(r.get("Ville")), nom=_txt(r.get("Quartier / Pôle")), type=_txt(r.get("Type")),
-                      pays=_txt(r.get("Pays")), slug=_txt(r.get("Slug")), priorite=int(_num(r.get("Priorité SEO")) or 2))
+                      pays=_txt(r.get("Pays")), slug=_txt(r.get("Slug")), priorite=int(_num(r.get("Priorité SEO")) or 2),
+                      lat=_num(r.get("Latitude")), lon=_num(r.get("Longitude")))
                  for r in _rows(wb, "04_Quartiers_Affaires") if r.get("Slug")]
     hotels = [dict(ville=_txt(r.get("Ville")), nom=_txt(r.get("Hôtel")), categorie=_txt(r.get("Catégorie")),
                    zone=_txt(r.get("Zone")), pays=_txt(r.get("Pays")))
@@ -156,34 +195,10 @@ def charger(path, phases_publiees):
         dep, dest = lieux[a], lieux[b]
         typ = _txt(r.get("Type"))
         reelle = _num(r.get("Distance réelle (km)"))
-        d = int(round(reelle)) if reelle else int(round(haversine(dep, dest) * P["p_facteur"]))
-        vit = P["p_vit_lente"] if d < P["p_seuil_vitesse"] else P["p_vit_rapide"]
-        minutes = int(round(d / vit * 60 / 15)) * 15 or 15
-
-        if d < P["p_local"]:
-            score = 0
-        else:
-            R = max([l.rayon for l in (dep, dest) if l.categorie != "Ville"] or [0])
-            if typ == "Aéroport → Aéroport":
-                s = P["p_pts_plein"]
-            elif R:
-                s = P["p_pts_plein"] if d <= R else P["p_pts_moyen"] if d <= P["p_mult2"] * R else P["p_pts_r3"]
-            else:
-                s = P["p_pts_plein"] if d >= P["p_vv_min"] else P["p_pts_moyen"] if d >= P["p_vv_moy"] else P["p_pts_court"]
-            s += sum(P["p_prio1"] if l.priorite == 1 else P["p_prio2"] for l in (dep, dest))
-            s += P["p_tf"] if dep.pays != dest.pays else 0
-            s += P["p_hub"] * [dep.bonus, dest.bonus].count("Hub")
-            s += P["p_prem"] if "Premium" in (dep.bonus, dest.bonus) else 0
-            score = int(s)
-        if d < P["p_local"]:
-            phase = "Local → page infra"
-        else:
-            phase = "Phase 1" if score >= P["p_ph1"] else "Phase 2" if score >= P["p_ph2"] else "Phase 3"
-        segment = ("Local" if d < P["p_local"] else "Courte distance" if d < P["p_vv_min"]
-                   else "Longue distance" if d < P["p_tres_long"] else "Très longue distance")
         forcer = _txt(r.get("Forcer (Publier / Masquer)")).lower()
-        t = Trajet(dep, dest, typ, _txt(r.get("Intention")), _txt(r.get("Mot-clé cible")), _txt(r.get("Source")),
-                   d, bool(reelle), minutes, score, phase, segment, _txt(r.get("Axes routiers")), forcer)
-        t.publie = forcer.startswith("publ") or (not forcer.startswith("masq") and phase in phases_publiees)
+        t = calculer(dep, dest, typ, P, reelle=reelle, intention=_txt(r.get("Intention")),
+                     mot_cle=_txt(r.get("Mot-clé cible")), source=_txt(r.get("Source")),
+                     axes=_txt(r.get("Axes routiers")), forcer=forcer)
+        t.publie = forcer.startswith("publ") or (not forcer.startswith("masq") and t.phase in phases_publiees)
         trajets.append(t)
     return dict(params=P, lieux=lieux, quartiers=quartiers, hotels=hotels, trajets=trajets, erreurs=erreurs)
