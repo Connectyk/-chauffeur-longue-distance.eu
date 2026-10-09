@@ -93,9 +93,14 @@
       var bouton = f.querySelector('button[type="submit"]');
       bouton.disabled = true;
       statut.textContent = "Envoi de votre demande…";
-      fetch(SITE.endpoint, { method: "POST", body: new FormData(f), headers: { Accept: "application/json" } })
+      // Formspree répond en JSON ; les autres services (Make…) sont appelés sans lecture de la réponse,
+      // pour ne pas afficher d'erreur au visiteur quand la demande est bien partie.
+      var formspree = SITE.endpoint.indexOf("formspree.io") !== -1;
+      var options = formspree ? { method: "POST", body: new FormData(f), headers: { Accept: "application/json" } }
+                              : { method: "POST", body: new FormData(f), mode: "no-cors" };
+      fetch(SITE.endpoint, options)
         .then(function (r) {
-          if (!r.ok) throw new Error();
+          if (r.type !== "opaque" && !r.ok) throw new Error();
           suivre("demande_devis", { depart: f.depart.value, destination: f.destination.value, entree: prov.entree || "" });
           f.reset();
           f.querySelector('[name="page"]').value = location.pathname;

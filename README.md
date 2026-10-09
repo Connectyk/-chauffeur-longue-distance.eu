@@ -99,8 +99,8 @@ Dès que possible, remplacez-les par des photos de vos propres véhicules.
 
 ## Formulaire de devis
 
-GitHub Pages n'envoie pas d'emails : le formulaire passe par **Formspree** (formspree.io).
-Créez un formulaire, copiez l'adresse `https://formspree.io/f/xxxxxx` dans `formulaire_endpoint`.
+GitHub Pages n'envoie pas d'emails : le formulaire envoie chaque demande à l'adresse `formulaire_endpoint`.
+Elle est branchée sur un scénario **Make** (make.com) : Webhook → message **Telegram**. Une adresse Formspree (`https://formspree.io/f/xxxxxx`) fonctionne aussi.
 Chaque demande contient la page d'origine, la page d'entrée, le référent et les paramètres UTM / gclid.
 Tant que l'adresse est vide, le formulaire invite à appeler le standard.
 
