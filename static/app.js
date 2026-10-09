@@ -74,10 +74,19 @@
     f.querySelector('[name="page"]').value = location.pathname;
     f.querySelector('[name="provenance"]').value = JSON.stringify(prov);
     var statut = f.querySelector(".form-statut");
+    var ouvertLe = Date.now();
 
     f.addEventListener("submit", function (e) {
       e.preventDefault();
       statut.className = "form-statut";
+      // Anti-spam : champ piège invisible rempli, ou formulaire envoyé en moins de 3 secondes = robot.
+      // On affiche une fausse confirmation et rien n'est envoyé.
+      var piege = f.querySelector('[name="site_web"]');
+      if ((piege && piege.value) || Date.now() - ouvertLe < 3000) {
+        statut.textContent = "Demande envoyée. Le standard vous rappelle rapidement.";
+        statut.classList.add("ok");
+        return;
+      }
       if (!f.checkValidity()) {
         var champ = f.querySelector(":invalid");
         statut.textContent = "Complétez le champ « " + champ.closest("label").firstChild.textContent.trim() + " » pour envoyer la demande.";
@@ -96,8 +105,10 @@
       // Formspree répond en JSON ; les autres services (Make…) sont appelés sans lecture de la réponse,
       // pour ne pas afficher d'erreur au visiteur quand la demande est bien partie.
       var formspree = SITE.endpoint.indexOf("formspree.io") !== -1;
-      var options = formspree ? { method: "POST", body: new FormData(f), headers: { Accept: "application/json" } }
-                              : { method: "POST", body: new FormData(f), mode: "no-cors" };
+      var donnees = new FormData(f);
+      donnees.delete("site_web");
+      var options = formspree ? { method: "POST", body: donnees, headers: { Accept: "application/json" } }
+                              : { method: "POST", body: donnees, mode: "no-cors" };
       fetch(SITE.endpoint, options)
         .then(function (r) {
           if (r.type !== "opaque" && !r.ok) throw new Error();
